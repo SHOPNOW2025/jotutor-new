@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="https://i.ibb.co/XxGsLR3D/15.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JoTutor - Middle East 1st Tutors platform</title>
+    
+    <!-- Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Mastercard Hosted Checkout Script (As provided by user) -->
+    <script 
+      src="https://test-network.mtf.gateway.mastercard.com/static/checkout/checkout.min.js" 
+      data-afterRedirect="Checkout.restoreFormFields" 
+      data-error="errorCallback" 
+      data-cancel="cancelCallback"
+    ></script>
+
+    <script type="text/javascript">
+        // دوال الاستجابة المطلوبة من مكتبة البنك لربطها بـ React
+        function errorCallback(error) {
+            console.error("Mastercard Error:", JSON.stringify(error));
+            window.dispatchEvent(new CustomEvent('mpgs-payment-error', { detail: error }));
+        }
+        function cancelCallback() {
+            console.log('Payment cancelled by user');
+            window.dispatchEvent(new CustomEvent('mpgs-payment-cancel'));
+        }
+        function restoreFormFields() {
+            console.log('Restoring form fields...');
+        }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              blue: { 800: '#00152e', 900: '#002146' },
+              green: { 500: '#84bc35', 600: '#6a992a' }
+            },
+            fontFamily: { sans: ['Cairo', 'sans-serif'] }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      body { font-family: 'Cairo', sans-serif; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+      .mpgs-input-container { background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb; height: 3rem; }
+    </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

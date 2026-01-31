@@ -1,0 +1,238 @@
+
+export type Page = 
+  'home' | 'teachers' | 'teacher-profile' | 'courses' | 'course-profile' | 
+  'payment' | 'videos' | 'short-player' | 'blog' | 'article' | 'about' | 
+  'contact' | 'faq' | 'privacy' | 'terms' | 'payment-refund' |
+  'dashboard' | 'admin-dashboard' | 'admin-user-view';
+
+export type DashboardView = 'profile' | 'courses' | 'wallet' | 'ai-assistant';
+
+export type Currency = 'JOD' | 'USD' | 'SAR';
+export type Language = 'ar' | 'en';
+
+export interface HeroSlide {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  // English version
+  title_en?: string;
+  description_en?: string;
+}
+
+export interface Teacher {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  level: string;
+  experience: number;
+  specialties: string[];
+  rating: number;
+  reviews: number;
+  pricePerHour: number;
+  bio: string;
+  qualifications: string[];
+  // English version
+  name_en?: string;
+  level_en?: string;
+  bio_en?: string;
+  specialties_en?: string[];
+  qualifications_en?: string[];
+}
+
+// Fix: Added missing Testimonial interface to resolve exported member errors across the application.
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl: string;
+  quote: string;
+  // English version
+  name_en?: string;
+  role_en?: string;
+  quote_en?: string;
+}
+
+export interface Course {
+    id: string;
+    title: string;
+    description: string;
+    teacher: string;
+    price?: number; 
+    priceJod?: number;
+    priceUsd?: number;
+    priceSar?: number;
+    duration: string;
+    level: string;
+    imageUrl: string;
+    category: string;
+    curriculum?: string;
+    isFeatured?: boolean;
+    sessionCount?: number;
+    totalHours?: number;
+    includedSubjects?: string;
+    targetGrades?: string[];
+    // English Version (Separated Fields)
+    title_en?: string;
+    description_en?: string;
+    level_en?: string;
+    category_en?: string;
+    curriculum_en?: string;
+    duration_en?: string;
+    includedSubjects_en?: string;
+}
+
+export interface UserProfile {
+    id: string;
+    username: string;
+    email: string;
+    phone: string;
+    password?: string;
+    userType: 'Student' | 'Parent';
+    serviceType: string;
+    educationStage: string;
+    grade: string;
+    curriculum: string;
+    subjects: string[];
+    age: string;
+    enrolledCourses?: string[];
+}
+
+export interface OnboardingOptions {
+    serviceTypes: string[];
+    educationStages: string[];
+    curriculums: string[];
+    subjects: string[];
+    languages: string[];
+    // English Version
+    serviceTypes_en?: string[];
+    educationStages_en?: string[];
+    curriculums_en?: string[];
+    subjects_en?: string[];
+}
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  author: string;
+  date: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+  tags: string[];
+  type: 'article' | 'short';
+  youtubeVideoId?: string;
+  // English version
+  title_en?: string;
+  excerpt_en?: string;
+  content_en?: string;
+  tags_en?: string[];
+}
+
+export interface ContactContent {
+  email: string;
+  phone: string;
+  address: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  linkedin?: string;
+}
+
+export interface HomepageContent {
+  featuresTitle: string;
+  featuresSubtitle: string;
+  feature1Title: string;
+  feature1Desc: string;
+  feature2Title: string;
+  feature2Desc: string;
+  feature3Title: string;
+  feature3Desc: string;
+  howItWorksTitle: string;
+  howItWorksSubtitle: string;
+  step1Title: string;
+  step1Desc: string;
+  step2Title: string;
+  step2Desc: string;
+  step3Title: string;
+  step3Desc: string;
+  teacherSearchTitle: string;
+  teacherSearchSubtitle: string;
+  discoverMoreTeachers: string;
+  coursesPreviewTitle: string;
+  coursesPreviewSubtitle: string;
+  discoverMoreCourses: string;
+  testimonialsTitle: string;
+  testimonialsSubtitle: string;
+  aiPlannerTitle: string;
+  aiPlannerSubtitle: string;
+  statsTeacherCount?: string;
+  statsTeacherLabel?: string;
+  statsAcceptanceRate?: string;
+  statsAcceptanceLabel?: string;
+  statsStudentCount?: string;
+  statsStudentLabel?: string;
+  statsSatisfactionRate?: string;
+  statsSatisfactionLabel?: string;
+}
+
+export interface AboutContent {
+  heroImage: string;
+  aboutTitle: string;
+  visionTitle: string;
+  vision: string;
+  visionImage: string;
+  missionTitle: string;
+  mission: string;
+  teacherCommunityTitle: string;
+  teacherCommunity: string;
+  whyJoTutorTitle: string;
+  whyJoTutor: string[];
+}
+
+export interface SiteContent {
+  geminiApiKey?: string;
+  homepage: HomepageContent;
+  about: AboutContent;
+  faq: FAQItem[];
+  contact: ContactContent;
+  privacy: string;
+  terms: string;
+  paymentRefundPolicy?: string;
+}
+
+export interface ChatMessage {
+    sender: 'user' | 'bot';
+    text: string;
+    courses?: Course[];
+}
+
+export type StaffPermission = 'Full Control' | 'Manage Teachers' | 'Manage Users' | 'Manage Blog';
+
+export interface StaffMember {
+    id: string;
+    name: string;
+    email: string;
+    permissions: StaffPermission;
+}
+
+export interface Payment {
+    id: string;
+    date: string;
+    userId: string;
+    userName: string;
+    courseId: string;
+    courseName: string;
+    amount: number;
+    currency: Currency;
+    status: 'Success' | 'Failed' | 'Pending';
+    paymentMethod?: 'Credit Card' | 'CliQ' | 'Manual';
+    gatewayOrderId?: string;
+    transactionId?: string;
+}
