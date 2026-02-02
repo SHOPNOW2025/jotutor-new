@@ -45,7 +45,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onStartChat, onClose }) => 
                         مرحباً بك في جو توتر
                     </div>
                     
-                    <h3 className="text-3xl sm:text-4xl font-black text-blue-900 mb-2 leading-tight">
+                    <h3 className="text-3xl sm:text-4xl font-black text-blue-600 mb-2 leading-tight">
                         أهلاً بك! 👋
                     </h3>
                     
