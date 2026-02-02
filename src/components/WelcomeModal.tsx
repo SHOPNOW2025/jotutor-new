@@ -16,7 +16,6 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onStartChat, onClose }) => 
 
             {/* محتوى النافذة - تم إزالة overflow-hidden للسماح ببروز الأيقونة */}
             <div className="relative bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-lg p-6 sm:p-10 text-center transform transition-all animate-fade-in-up border-[6px] border-green-500 my-16">
-                
                 {/* زر الإغلاق المميز */}
                 <button 
                     onClick={onClose}
@@ -46,9 +45,9 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onStartChat, onClose }) => 
                         مرحباً بك في جو توتر
                     </div>
                     
-                    <h2 className="text-3xl sm:text-4xl font-black text-blue-900 mb-2 leading-tight">
+                    <h3 className="text-3xl sm:text-4xl font-black text-blue-900 mb-2 leading-tight">
                         أهلاً بك! 👋
-                    </h2>
+                    </h3>
                     
                     <h3 className="text-xl sm:text-2xl font-bold text-green-600 mb-6">
                         معك المساعد الذكي <span className="text-blue-900 underline decoration-green-500 underline-offset-4">Mr.Pincel</span>
