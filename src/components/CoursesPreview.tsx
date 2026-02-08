@@ -14,15 +14,8 @@ interface CoursesPreviewProps {
 }
 
 const CoursesPreview: React.FC<CoursesPreviewProps> = ({ courses, onSelectCourse, onNavigate, currency, exchangeRate, content, strings }) => {
-    // Filter strictly for courses marked as 'isFeatured'.
-    // If no courses are featured, we can either show nothing or fallback to the first 4.
-    // Let's fallback to the most recent 4 (assumed to be at the top of the list) if nothing is featured, 
-    // to ensure the section isn't empty for new installs.
     const featuredCourses = courses.filter(c => c.isFeatured);
-    
-    const coursesToShow = featuredCourses.length > 0 
-        ? featuredCourses.slice(0, 4) 
-        : courses.slice(0, 4);
+    const coursesToShow = featuredCourses.length > 0 ? featuredCourses.slice(0, 4) : courses.slice(0, 4);
 
     return (
         <section id="courses-preview" className="py-20 bg-white">
@@ -46,7 +39,10 @@ const CoursesPreview: React.FC<CoursesPreviewProps> = ({ courses, onSelectCourse
                 </div>
 
                 <div className="text-center mt-12">
-                    <button onClick={() => onNavigate('courses')} className="bg-green-500 text-white font-bold text-lg py-3 px-8 rounded-full hover:bg-green-600 transition-transform duration-300 transform hover:scale-105 shadow-xl">
+                    <button 
+                        onClick={() => onNavigate('courses')} 
+                        className="bg-green-500 text-white font-bold text-lg py-3 px-10 rounded-full hover:bg-green-600 transition-all shadow-xl transform hover:-translate-y-1"
+                    >
                         {content?.discoverMoreCourses || strings.discoverMoreCourses}
                     </button>
                 </div>
