@@ -15,7 +15,7 @@ export interface HeroSlide {
   title: string;
   description: string;
   imageUrl: string;
-  // English version
+  // English version fields
   title_en?: string;
   description_en?: string;
 }
@@ -32,7 +32,7 @@ export interface Teacher {
   pricePerHour: number;
   bio: string;
   qualifications: string[];
-  // English version
+  // English version fields
   name_en?: string;
   level_en?: string;
   bio_en?: string;
@@ -40,14 +40,13 @@ export interface Teacher {
   qualifications_en?: string[];
 }
 
-// Fix: Added missing Testimonial interface to resolve exported member errors across the application.
 export interface Testimonial {
   id: string;
   name: string;
   role: string;
   avatarUrl: string;
   quote: string;
-  // English version
+  // English version fields
   name_en?: string;
   role_en?: string;
   quote_en?: string;
@@ -72,7 +71,7 @@ export interface Course {
     totalHours?: number;
     includedSubjects?: string;
     targetGrades?: string[];
-    // English Version (Separated Fields)
+    // English version fields
     title_en?: string;
     description_en?: string;
     level_en?: string;
@@ -104,7 +103,7 @@ export interface OnboardingOptions {
     curriculums: string[];
     subjects: string[];
     languages: string[];
-    // English Version
+    // English version lists
     serviceTypes_en?: string[];
     educationStages_en?: string[];
     curriculums_en?: string[];
@@ -115,6 +114,9 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
+  // English version
+  question_en?: string;
+  answer_en?: string;
 }
 
 export interface BlogPost {
@@ -128,7 +130,7 @@ export interface BlogPost {
   tags: string[];
   type: 'article' | 'short';
   youtubeVideoId?: string;
-  // English version
+  // English version fields
   title_en?: string;
   excerpt_en?: string;
   content_en?: string;

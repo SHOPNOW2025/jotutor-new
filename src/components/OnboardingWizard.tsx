@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { UserProfile, OnboardingOptions, Language } from '../types';
 
@@ -33,8 +34,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
     const [formData, setFormData] = useState<Partial<UserProfile>>({
         userType: 'Student',
         subjects: [],
-        serviceType: options.serviceTypes?.[0],
-        educationStage: options.educationStages?.[0],
+        serviceType: language === 'en' && options.serviceTypes_en?.length ? options.serviceTypes_en[0] : options.serviceTypes?.[0],
+        educationStage: language === 'en' && options.educationStages_en?.length ? options.educationStages_en[0] : options.educationStages?.[0],
         curriculum: '', 
         phone: '',
     });
@@ -65,7 +66,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                 break;
             case 5: // Curriculum
                 if (!formData.curriculum) {
-                    setError("الرجاء اختيار منهاج واحد على الأقل.");
+                    setError(language === 'en' ? "Please select at least one curriculum." : "الرجاء اختيار منهاج واحد على الأقل.");
                     return false;
                 }
                 break;
@@ -156,7 +157,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
         if (!validateStep(7)) return;
 
         setIsSubmitting(true);
-        // Combine country code with phone number
         const fullPhone = `${countryCode}${formData.phone?.replace(/^0+/, '')}`;
 
         const finalProfile: UserProfile = {
@@ -182,20 +182,26 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
 
     const totalSteps = 8;
     
-    const serviceTypeDetails = {
-        [options.serviceTypes[0]]: strings.serviceType1Desc,
-        [options.serviceTypes[1]]: strings.serviceType2Desc,
-        [options.serviceTypes[2]]: strings.serviceType3Desc,
-        [options.serviceTypes[3]]: strings.serviceType4Desc,
-        [options.serviceTypes[4]]: strings.serviceType5Desc,
+    // Choose correct data lists based on language
+    const serviceTypeList = language === 'en' && options.serviceTypes_en?.length ? options.serviceTypes_en : options.serviceTypes;
+    const educationStageList = language === 'en' && options.educationStages_en?.length ? options.educationStages_en : options.educationStages;
+    const curriculumList = language === 'en' && options.curriculums_en?.length ? options.curriculums_en : options.curriculums;
+    const subjectList = language === 'en' && options.subjects_en?.length ? options.subjects_en : options.subjects;
+
+    const serviceTypeDetails: any = {
+        [serviceTypeList[0]]: strings.serviceType1Desc,
+        [serviceTypeList[1]]: strings.serviceType2Desc,
+        [serviceTypeList[2]]: strings.serviceType3Desc,
+        [serviceTypeList[3]]: strings.serviceType4Desc,
+        [serviceTypeList[4]]: strings.serviceType5Desc,
     };
     
-    const educationStageDetails = {
-        [options.educationStages[0]]: strings.educationStage1Desc,
-        [options.educationStages[1]]: strings.educationStage2Desc,
-        [options.educationStages[2]]: strings.educationStage3Desc,
-        [options.educationStages[3]]: strings.educationStage4Desc,
-        [options.educationStages[4]]: strings.educationStage5Desc,
+    const educationStageDetails: any = {
+        [educationStageList[0]]: strings.educationStage1Desc,
+        [educationStageList[1]]: strings.educationStage2Desc,
+        [educationStageList[2]]: strings.educationStage3Desc,
+        [educationStageList[3]]: strings.educationStage4Desc,
+        [educationStageList[4]]: strings.educationStage5Desc,
     };
 
     const renderStepContent = () => {
@@ -220,7 +226,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                         <h3 className="text-xl font-semibold text-center mb-2">{strings.onboardingStep2Title}</h3>
                         <p className="text-center text-gray-600 mb-6">{strings.onboardingStep2Desc}</p>
                         <div className="space-y-3">
-                            {options.serviceTypes.map(type => (
+                            {serviceTypeList.map(type => (
                                 <button key={type} type="button" onClick={() => handleSelect('serviceType', type)} className={`w-full text-right p-3 border rounded-lg transition-all duration-200 ${formData.serviceType === type ? 'bg-green-100 border-green-500 ring-2 ring-green-500' : 'bg-white hover:border-green-400'}`}>
                                     <span className="font-semibold text-blue-900">{type}</span>
                                     <p className="text-sm text-gray-600">{serviceTypeDetails[type]}</p>
@@ -235,7 +241,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                         <h3 className="text-xl font-semibold text-center mb-2">{strings.onboardingStep3Title}</h3>
                         <p className="text-center text-gray-600 mb-6">{strings.onboardingStep3Desc}</p>
                         <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
-                            {options.educationStages.map(stage => (
+                            {educationStageList.map(stage => (
                                 <button key={stage} type="button" onClick={() => handleSelect('educationStage', stage)} className={`w-full text-right p-3 border rounded-lg transition-all duration-200 ${formData.educationStage === stage ? 'bg-green-100 border-green-500 ring-2 ring-green-500' : 'bg-white hover:border-green-400'}`}>
                                     <span className="font-semibold text-blue-900">{stage}</span>
                                     <p className="text-sm text-gray-600">{educationStageDetails[stage]}</p>
@@ -267,9 +273,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                  return (
                      <div>
                         <h3 className="text-xl font-semibold text-center mb-2">{strings.onboardingStep5Title}</h3>
-                        <p className="text-center text-gray-600 mb-6">{strings.onboardingStep5Desc} (يمكنك اختيار أكثر من منهاج)</p>
+                        <p className="text-center text-gray-600 mb-6">{strings.onboardingStep5Desc} {language === 'ar' ? '(يمكنك اختيار أكثر من منهاج)' : '(You can select more than one)'}</p>
                         <div className="space-y-3">
-                            {options.curriculums.map(c => (
+                            {curriculumList.map(c => (
                                 <button key={c} type="button" onClick={() => handleCurriculumToggle(c)} className={`w-full text-right p-3 border rounded-lg transition-all duration-200 flex justify-between items-center ${selectedCurriculums.includes(c) ? 'bg-green-100 border-green-500 ring-2 ring-green-500' : 'bg-white hover:border-green-400'}`}>
                                     <span className="font-semibold text-blue-900">{c}</span>
                                     {selectedCurriculums.includes(c) && <span className="text-green-600 font-bold">✓</span>}
@@ -279,10 +285,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                     </div>
                 );
             case 6:
-                const isLearningLanguages = formData.serviceType === options.serviceTypes[4];
+                const isLearningLanguages = formData.serviceType === options.serviceTypes[4] || formData.serviceType === options.serviceTypes_en?.[4];
                 const title = isLearningLanguages ? strings.onboardingStep6Title_languages : strings.onboardingStep6Title;
                 const description = isLearningLanguages ? strings.onboardingStep6Desc_languages : strings.onboardingStep6Desc;
-                const itemsToShow = isLearningLanguages ? (options.languages || []) : options.subjects;
+                const itemsToShow = isLearningLanguages ? (options.languages || []) : subjectList;
                 
                 return (
                      <div>
@@ -305,7 +311,6 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                         <input type="text" placeholder={strings.fullName} onChange={e => handleSelect('username', e.target.value)} value={formData.username || ''} className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 outline-none" required />
                         <input type="number" placeholder={strings.age} onChange={e => handleSelect('age', e.target.value)} value={formData.age || ''} className="w-full p-3 border border-gray-300 rounded-md text-gray-700 focus:ring-2 focus:ring-green-500 outline-none" required min="1" max="100" />
                         
-                        {/* Phone with Country Code Select */}
                         <div className="flex gap-2">
                             <select 
                                 value={countryCode} 
@@ -366,16 +371,16 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ options, onSignupSu
                 <div className="min-h-[350px] flex flex-col justify-center py-4 bg-gray-50 p-6 rounded-lg shadow-inner">
                     {renderStepContent()}
                 </div>
-                 {error && <p className="text-red-500 text-center text-sm mt-4">{error}</p>}
+                 {error && <p className="text-red-500 text-center text-sm mt-4 font-bold">{error}</p>}
                 <div className="flex justify-between mt-6">
                     {step > 1 ? (
-                        <button type="button" onClick={handleBack} className="bg-gray-200 text-gray-800 py-2 px-6 rounded-md hover:bg-gray-300 transition-colors">{strings.back}</button>
+                        <button type="button" onClick={handleBack} className="bg-gray-200 text-gray-800 py-2 px-6 rounded-md hover:bg-gray-300 transition-colors font-bold">{strings.back}</button>
                     ) : <div />}
                     
                     {step < totalSteps ? (
-                        <button type="button" onClick={handleNext} className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition-colors">{strings.next}</button>
+                        <button type="button" onClick={handleNext} className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition-colors font-bold">{strings.next}</button>
                     ) : (
-                        <button type="submit" disabled={!termsAgreed || isSubmitting} className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <button type="submit" disabled={!termsAgreed || isSubmitting} className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-bold">
                             {isSubmitting ? `${strings.generating}...` : strings.finishSignup}
                         </button>
                     )}
