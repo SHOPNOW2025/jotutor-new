@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Mastercard Hosted Session Script (Production URL for Merchant 9547143225EP) -->
+    <!-- Mastercard Hosted Session Script (Production Gateway) -->
     <script src="https://ap-gateway.mastercard.com/form/version/72/merchant/9547143225EP/session.js"></script>
 
     <!-- Tailwind CSS -->
@@ -32,23 +32,29 @@
     </script>
 
     <style>
-      body { font-family: 'Cairo', sans-serif; }
+      body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .animate-fade-in { animation: fadeIn 0.4s ease-out; }
       
-      /* تنسيقات حقول البنك المدمجة */
+      /* تنسيقات حقول الدفع (Mastercard Hosted Fields) */
       .mpgs-field-container { 
         height: 3.5rem; 
-        background-color: #f9fafb; 
-        border: 1px solid #e5e7eb; 
-        border-radius: 0.75rem;
-        padding: 0.5rem;
+        background-color: #ffffff; 
+        border: 2px solid #e5e7eb; 
+        border-radius: 1rem;
+        padding: 0 1rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
       }
       .mpgs-field-container:focus-within {
         border-color: #84bc35;
-        box-shadow: 0 0 0 2px rgba(132, 188, 53, 0.1);
+        box-shadow: 0 0 0 4px rgba(132, 188, 53, 0.1);
       }
+      /* ضمان أن الـ iframe المولد من البنك يملأ الحاوية بالكامل */
       iframe { width: 100% !important; height: 100% !important; border: none !important; }
+      
+      .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 
 <script type="importmap">
