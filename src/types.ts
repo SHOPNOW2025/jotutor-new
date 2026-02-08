@@ -74,6 +74,7 @@ export interface Course {
     // English version fields
     title_en?: string;
     description_en?: string;
+    teacher_en?: string;
     level_en?: string;
     category_en?: string;
     curriculum_en?: string;

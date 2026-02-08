@@ -91,6 +91,7 @@ const App: React.FC = () => {
             ...c,
             title: c.title_en || c.title,
             description: c.description_en || c.description,
+            teacher: c.teacher_en || c.teacher,
             level: c.level_en || c.level,
             category: c.category_en || c.category,
             curriculum: c.curriculum_en || c.curriculum,
