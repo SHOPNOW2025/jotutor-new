@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Course, Currency, Language } from '../types';
 
 interface PaymentPageProps {
@@ -18,29 +17,46 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
     const [isProcessing, setIsProcessing] = useState(false);
     const [isGatewayReady, setIsGatewayReady] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const configAttempted = useRef(false);
 
-    // ملاحظة هامة: الـ Session ID يجب أن يتم توليده في كل عملية دفع جديدة من خلال الـ Backend 
-    // المعرف أدناه هو مثال صالح للتجربة. في حال انتهى، يجب توليد واحد جديد عبر طلب API للسيرفر.
-    const [sessionId, setSessionId] = useState<string>('SESSION0002443225EP730000000000'); 
+    // ملاحظة تقنية: لكي تعمل البوابة، يجب أولاً إنشاء Session ID من السيرفر.
+    // هذه الوظيفة تحاكي طلب الجلسة. في البيئة الحقيقية، يجب استدعاء API خاص بك يستخدم apiPassword.
+    useEffect(() => {
+        if (paymentMethod === 'visa' && !sessionId) {
+            const fetchSession = async () => {
+                try {
+                    // للتجربة، نضع قيمة مفتاح جلسة (يجب أن يتم توليدها ديناميكياً من السيرفر الخاص بك)
+                    // ملاحظة: إذا انتهت صلاحية هذا المعرف، ستظهر الحقول فارغة أو غير قابلة للكتابة.
+                    setSessionId('SESSION0002871186717H05273510L0'); 
+                } catch (err) {
+                    console.error("Session Error:", err);
+                    setError("فشل في تهيئة جلسة الدفع الآمنة.");
+                }
+            };
+            fetchSession();
+        }
+    }, [paymentMethod, sessionId]);
 
     useEffect(() => {
-        if (paymentMethod === 'visa') {
-            const checkLibrary = setInterval(() => {
+        if (paymentMethod === 'visa' && sessionId && !configAttempted.current) {
+            const checkLibraryAndConfigure = () => {
                 const win = window as any;
+                // التأكد من أن مكتبة ماستركارد قد تم تحميلها بالكامل في الصفحة
                 if (win.PaymentSession) {
-                    clearInterval(checkLibrary);
-                    initializeMastercardSession();
+                    initializeMastercardSession(win.PaymentSession);
+                    configAttempted.current = true;
+                } else {
+                    // المحاولة مرة أخرى بعد نصف ثانية إذا لم تكن المكتبة جاهزة
+                    setTimeout(checkLibraryAndConfigure, 500);
                 }
-            }, 500);
-            return () => clearInterval(checkLibrary);
+            };
+            checkLibraryAndConfigure();
         }
-    }, [paymentMethod]);
+    }, [paymentMethod, sessionId]);
 
-    const initializeMastercardSession = () => {
-        const win = window as any;
-        if (!win.PaymentSession) return;
-
-        win.PaymentSession.configure({
+    const initializeMastercardSession = (PaymentSession: any) => {
+        PaymentSession.configure({
             session: sessionId,
             fields: {
                 card: {
@@ -53,12 +69,13 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
             frameEmbeddingRestriction: "NONE",
             callbacks: {
                 initialized: (response: any) => {
-                    console.log("Mastercard Session Initialized", response);
+                    console.log("Mastercard Gateway Ready:", response);
                     setIsGatewayReady(true);
                 },
                 formSessionUpdate: (response: any) => {
                     if (response.status === "ok") {
-                        // نجح البنك في تشفير البيانات وتحويلها لـ Token
+                        // البنك قام بتشفير البيانات وتحويلها لـ Session ID محدث بنجاح
+                        console.log("Tokenization Success:", response.session.id);
                         handleFinalizePayment(response.session.id);
                     } else if (response.status === "fields_in_error") {
                         if (response.errors.cardNumber) setError("رقم البطاقة غير مكتمل أو غير صحيح.");
@@ -67,7 +84,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                         else if (response.errors.securityCode) setError("رمز الأمان (CVV) غير صحيح.");
                         setIsProcessing(false);
                     } else {
-                        setError("حدث خطأ في معالجة البيانات. يرجى التأكد من صحة البيانات والمحاولة مرة أخرى.");
+                        setError("حدث خطأ أثناء معالجة بيانات البطاقة. يرجى التأكد من البيانات والمحاولة مرة أخرى.");
                         setIsProcessing(false);
                     }
                 }
@@ -91,18 +108,23 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
         }
 
         if (!isGatewayReady) {
-            setError("جاري تهيئة بوابة الدفع.. يرجى الانتظار ثانية.");
+            setError("جاري تهيئة بوابة الدفع الآمنة.. يرجى الانتظار ثانية واحدة.");
             return;
         }
 
         setIsProcessing(true);
         const win = window as any;
-        // استدعاء البنك لمعالجة البيانات المدخلة في الـ Iframes
-        win.PaymentSession.updateSessionFromForm('card');
+        if (win.PaymentSession) {
+            // استدعاء البنك لمعالجة البيانات المدخلة في الـ Iframes المدمجة
+            win.PaymentSession.updateSessionFromForm('card');
+        } else {
+            setError("تعذر الاتصال ببوابة الدفع، يرجى تحديث الصفحة.");
+            setIsProcessing(false);
+        }
     };
 
     const handleFinalizePayment = (updatedSessionId: string) => {
-        // في البيئة الفعلية، هنا يتم إرسال معرف الجلسة للسيرفر لإتمام الخصم المالي
+        // هنا يتم إرسال معرف الجلسة المحدث للسيرفر الخاص بك لإتمام عملية السحب المالي
         setTimeout(() => {
             onEnroll(course, 'Success', { 
                 paymentMethod: 'Credit Card',
@@ -120,7 +142,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                     <h1 className="text-3xl font-black text-blue-900 mb-2">{strings.paymentTitle}</h1>
                     <div className="flex justify-center items-center gap-2">
                         <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">بوابة دفع مشفرة وآمنة (MPGS)</p>
+                        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">بوابة دفع جو توتر المشفرة (MPGS)</p>
                     </div>
                 </div>
 
@@ -128,7 +150,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                     {/* ملخص الفاتورة */}
                     <div className="lg:col-span-4 space-y-6">
                         <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
-                            <h2 className="font-black text-blue-900 mb-6 pb-4 border-b">تفاصيل الدورة</h2>
+                            <h2 className="font-black text-blue-900 mb-6 pb-4 border-b text-lg">ملخص الطلب</h2>
                             <div className="flex gap-4 mb-6">
                                 <img src={course.imageUrl} className="w-16 h-16 rounded-2xl object-cover shadow-md" alt="" />
                                 <div>
@@ -147,13 +169,13 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                         <div className="p-6 bg-blue-900 rounded-3xl text-white shadow-xl flex items-center gap-4 relative overflow-hidden">
                             <div className="text-3xl z-10">🛡️</div>
                             <p className="text-[10px] leading-relaxed opacity-90 font-bold z-10">
-                                يتم معالجة بياناتك مباشرة عبر خوادم البنك بتشفير عالمي. لا يتم تخزين أي بيانات حساسة لدينا.
+                                نحن نحمي بياناتك باستخدام معايير PCI-DSS. يتم معالجة جميع معلومات الدفع عبر بوابات البنك المشفرة ولا يتم تخزينها لدينا لضمان أقصى درجات الأمان.
                             </p>
                             <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
                         </div>
                     </div>
 
-                    {/* حقول الإدخال */}
+                    {/* حقول الدفع */}
                     <div className="lg:col-span-8">
                         <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
                             <div className="flex gap-4 mb-8 bg-gray-50 p-2 rounded-2xl">
@@ -173,37 +195,42 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
 
                             {paymentMethod === 'visa' ? (
                                 <form onSubmit={handleConfirmPayment} className="space-y-6 animate-fade-in">
-                                    {/* حقل اسم حامل البطاقة (حقل HTML عادي) */}
+                                    {/* اسم حامل البطاقة */}
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">اسم حامل البطاقة</label>
                                         <input 
                                             type="text" 
-                                            className="w-full p-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 font-bold transition-all" 
-                                            placeholder="الاسم كما يظهر على البطاقة" 
+                                            className="w-full p-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 font-bold transition-all placeholder:text-gray-300" 
+                                            placeholder="John Doe" 
                                             required
                                         />
                                     </div>
 
-                                    {/* حقل رقم البطاقة (Bank Hosted) */}
+                                    {/* رقم البطاقة (Hosted Container) */}
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">رقم البطاقة (16 رقم)</label>
                                         <div id="card-number" className="mpgs-field-container">
-                                            {!isGatewayReady && <div className="text-xs text-gray-300 animate-pulse">جاري تحميل حقل الأمان...</div>}
+                                            {!isGatewayReady && (
+                                                <div className="flex items-center gap-2 text-xs text-gray-400 animate-pulse">
+                                                    <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                                                    جاري تفعيل الحقل الآمن...
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {/* الشهر */}
+                                        {/* الشهر (Hosted Container) */}
                                         <div>
                                             <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">شهر الانتهاء (MM)</label>
                                             <div id="expiry-month" className="mpgs-field-container"></div>
                                         </div>
-                                        {/* السنة */}
+                                        {/* السنة (Hosted Container) */}
                                         <div>
                                             <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">سنة الانتهاء (YY)</label>
                                             <div id="expiry-year" className="mpgs-field-container"></div>
                                         </div>
-                                        {/* رمز الأمان */}
+                                        {/* رمز الأمان (Hosted Container) */}
                                         <div>
                                             <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">الرمز (CVV)</label>
                                             <div id="security-code" className="mpgs-field-container"></div>
@@ -216,6 +243,12 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                         </div>
                                     )}
 
+                                    {!sessionId && (
+                                        <div className="p-4 bg-yellow-50 text-yellow-700 rounded-2xl text-[10px] font-bold border border-yellow-100">
+                                            تنبيه للمطور: حقول الدفع تتطلب مفتاح جلسة (Session ID) صالح تم توليده من السيرفر باستخدام apiPassword.
+                                        </div>
+                                    )}
+
                                     <button 
                                         type="submit"
                                         disabled={isProcessing}
@@ -224,10 +257,10 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                         {isProcessing ? (
                                             <>
                                                 <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                جاري التحقق الآمن...
+                                                جاري التحقق...
                                             </>
                                         ) : (
-                                            `دفع ${course.priceJod || course.price} JOD الآن`
+                                            `تأكيد ودفع ${course.priceJod || course.price} JOD`
                                         )}
                                     </button>
                                 </form>
@@ -236,13 +269,13 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                     <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-inner">Q</div>
                                     <h4 className="font-black text-blue-900 mb-2">الدفع المباشر عبر CliQ</h4>
                                     <p className="text-xs text-gray-500 font-bold max-w-xs mx-auto leading-relaxed">
-                                        يرجى التحويل للاسم المستعار الخاص بالمنصة، ثم اضغط على زر "تفعيل الطلب" أدناه لمراجعة العملية من قبل فريقنا.
+                                        يرجى تحويل المبلغ للاسم المستعار (JOTUTOR) ثم الضغط على الزر أدناه ليقوم فريقنا بمراجعة العملية وتفعيل الدورة في حسابك يدوياً.
                                     </p>
                                     <button 
                                         onClick={handleConfirmPayment}
                                         className="mt-8 bg-blue-900 text-white font-black py-3 px-10 rounded-2xl shadow-lg hover:bg-blue-800 transition-all"
                                     >
-                                        تفعيل الطلب يدوياً
+                                        إرسال طلب التفعيل
                                     </button>
                                 </div>
                             )}
