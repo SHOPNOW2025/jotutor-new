@@ -21,17 +21,23 @@
     ></script>
 
     <script type="text/javascript">
-        // دوال الاستجابة المطلوبة من مكتبة البنك لربطها بـ React
+        // دوال الاستجابة المطلوبة من مكتبة البنك
         function errorCallback(error) {
-            console.error("Mastercard Error:", JSON.stringify(error));
-            window.dispatchEvent(new CustomEvent('mpgs-payment-error', { detail: error }));
+            console.error("Payment Error:", JSON.stringify(error));
+            window.dispatchEvent(new CustomEvent('payment-error', { detail: error }));
         }
         function cancelCallback() {
-            console.log('Payment cancelled by user');
-            window.dispatchEvent(new CustomEvent('mpgs-payment-cancel'));
+            console.log('Payment cancelled');
+            window.dispatchEvent(new CustomEvent('payment-cancel'));
         }
         function restoreFormFields() {
-            console.log('Restoring form fields...');
+            console.log('Restoring fields...');
+        }
+        // دالة النجاح (تلقائية في Hosted Checkout عند إعادة التوجيه)
+        function completeCallback(resultIndicator, sessionVersion) {
+            window.dispatchEvent(new CustomEvent('payment-complete', { 
+                detail: { resultIndicator, sessionVersion } 
+            }));
         }
     </script>
 
@@ -55,7 +61,8 @@
       body { font-family: 'Cairo', sans-serif; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-      .mpgs-input-container { background: #f9fafb; border-radius: 0.75rem; border: 1px solid #e5e7eb; height: 3rem; }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
     </style>
 
 <script type="importmap">
