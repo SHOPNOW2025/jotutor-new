@@ -18,21 +18,21 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // المعلومات المطلوبة من العميل/الصورة
-    const MERCHANT_ID = 'test12122024';
-    const ORDER_ID = `test${Date.now().toString().slice(-8)}`; 
-    const ORDER_AMOUNT = (course.priceJod || course.price || 77).toString();
+    // معلومات بوابة الدفع (Production)
+    const MERCHANT_ID = '9547143225EP';
+    const ORDER_ID = `INV-${Date.now().toString().slice(-8)}`; 
+    const ORDER_AMOUNT = (course.priceJod || course.price || 0).toString();
     const ORDER_CURRENCY = 'JOD';
-    const ORDER_REFERENCE = `15${ORDER_ID}`;
+    const ORDER_REFERENCE = `JOT-${ORDER_ID}`;
 
     useEffect(() => {
         const handleError = (e: any) => {
             setIsProcessing(false);
-            setError("حدث خطأ أثناء الاتصال بالبنك. تأكد من اتصالك بالإنترنت.");
+            setError("حدث خطأ أثناء الاتصال ببوابة الدفع. يرجى التأكد من بيانات البطاقة.");
         };
         const handleCancel = () => {
             setIsProcessing(false);
-            setError("تم إلغاء عملية الدفع من قبلك.");
+            setError("تم إلغاء عملية الدفع.");
         };
 
         window.addEventListener('mpgs-payment-error', handleError);
@@ -55,10 +55,8 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
 
             if (win.Checkout) {
                 try {
-                    // ملاحظة: في بيئة الإنتاج يتم جلب session id من السيرفر
-                    // هنا نستخدم المعلومات المزودة في المثال لتفعيل واجهة الدفع
-                    const sessionId = 'SESSION0002493905223M27654405J4';
-
+                    // ملاحظة: في بيئة الإنتاج الفعلية، يتم جلب SESSION ID من السيرفر الخاص بك لحماية Credentials
+                    // هنا نقوم بضبط الإعدادات المطلوبة للواجهة
                     win.Checkout.configure({
                         merchant: MERCHANT_ID,
                         order: {
@@ -66,14 +64,15 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                             amount: ORDER_AMOUNT,
                             currency: ORDER_CURRENCY,
                             reference: ORDER_REFERENCE,
-                            description: "order payment "
+                            description: `Payment for ${course.title}`
                         },
                         session: {
-                            id: sessionId
+                            // يتم استبدال هذا بـ Session ID حقيقي من طلب API للسيرفر
+                            id: 'SESSION0002009503206N5848500E73' 
                         },
                         interaction: {
                             merchant: {
-                                name: "Network International / JoTutor"
+                                name: "JoTutor Platform"
                             },
                             displayControl: {
                                 billingAddress: 'HIDE',
@@ -82,16 +81,16 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                         }
                     });
 
-                    // تفعيل صفحة الدفع
+                    // تفعيل صفحة الدفع (Hosted Payment Page)
                     win.Checkout.showPaymentPage();
                     
                 } catch (err) {
                     console.error("Checkout Config Error", err);
-                    setError("تعذر بدء جلسة الدفع.");
+                    setError("تعذر بدء جلسة الدفع الآمنة.");
                     setIsProcessing(false);
                 }
             } else {
-                setError("جاري تحميل مكتبة البنك... يرجى الانتظار ثانية.");
+                setError("جاري تحميل نظام الدفع... يرجى المحاولة بعد لحظات.");
                 setIsProcessing(false);
             }
         }
@@ -101,11 +100,11 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
         <div className="py-20 bg-gray-50 min-h-screen">
             <div className="container mx-auto px-6 max-w-5xl">
                 <div className="text-center mb-10">
-                    <div className="inline-block bg-green-100 text-green-800 px-4 py-1 rounded-full text-xs font-black mb-4">
-                        بوابة دفع آمنة: {MERCHANT_ID}
+                    <div className="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full text-xs font-black mb-4">
+                        بوابة دفع بنكية آمنة (Production)
                     </div>
                     <h1 className="text-3xl font-black text-blue-900 mb-2">{strings.paymentTitle}</h1>
-                    <p className="text-gray-500 font-bold">رقم الطلب المقترح: {ORDER_ID}</p>
+                    <p className="text-gray-500 font-bold">معرف الدفع: {ORDER_ID}</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -128,9 +127,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                 </div>
                             </div>
                             <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-center gap-3">
-                                <span className="text-2xl">🔒</span>
+                                <span className="text-2xl">🛡️</span>
                                 <p className="text-[10px] text-blue-700 font-bold leading-tight">
-                                    سيتم توجيهك لصفحة الدفع الآمنة الخاصة بـ Network International لإتمام العملية بآمان تام.
+                                    دفع آمن 100% مشفر عبر خوادم البنك مباشرة. بياناتك محمية وفق أعلى المعايير العالمية.
                                 </p>
                             </div>
                         </div>
@@ -158,11 +157,11 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                 {paymentMethod === 'visa' ? (
                                     <div className="p-10 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 text-center animate-fade-in">
                                         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border-4 border-green-500">
-                                            <span className="text-3xl">💳</span>
+                                            <span className="text-3xl">🔒</span>
                                         </div>
-                                        <h4 className="font-black text-blue-900 mb-2">الدفع الآمن عبر البنك</h4>
+                                        <h4 className="font-black text-blue-900 mb-2">الدفع عبر البنك (Mastercard/Visa)</h4>
                                         <p className="text-sm text-gray-500 font-bold leading-relaxed max-w-sm mx-auto">
-                                            عند الضغط على الزر، ستفتح نافذة دفع آمنة مشفرة تابعة للبنك مباشرة لحماية بيانات بطاقتك.
+                                            سيتم فتح بوابة البنك الرسمية لإدخال بيانات بطاقتك بآمان.
                                         </p>
                                     </div>
                                 ) : (
@@ -170,7 +169,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                         <div className="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-lg">📱</div>
                                         <h4 className="font-black text-blue-900 mb-2">الدفع عبر تطبيق CliQ</h4>
                                         <p className="text-sm text-blue-700 font-bold leading-relaxed max-w-xs mx-auto">
-                                            يرجى التحويل إلى الاسم المستعار الخاص بنا، وسنقوم بتفعيل دورتك فور تأكيد الاستلام.
+                                            حول المبلغ للاسم المستعار الخاص بالمنصة، وسنقوم بالتفعيل فور التأكد.
                                         </p>
                                     </div>
                                 )}
@@ -189,10 +188,10 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                     {isProcessing ? (
                                         <>
                                             <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            جاري معالجة الطلب...
+                                            جاري الاتصال بالبنك...
                                         </>
                                     ) : (
-                                        paymentMethod === 'visa' ? `دفع ${ORDER_AMOUNT} JOD عبر البنك` : "تأكيد الطلب"
+                                        paymentMethod === 'visa' ? `دفع ${ORDER_AMOUNT} JOD بآمان` : "تأكيد طلب التفعيل"
                                     )}
                                 </button>
                             </form>
