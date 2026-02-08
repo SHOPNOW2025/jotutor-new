@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Course, Currency, Language } from '../types';
 
 interface PaymentPageProps {
@@ -18,34 +18,63 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // حالات الحقول (State)
-    const [cardData, setCardData] = useState({
-        name: '',
-        number: '',
-        month: '',
-        year: '',
-        cvv: ''
-    });
+    // ملاحظة: الـ Session ID يجب أن يتم إنشاؤه عبر السيرفر الخاص بك 
+    // باستخدام apiUsername و apiPassword اللذين زودتني بهما.
+    // سأستخدم معرف جلسة افتراضي هنا، ولكن عملياً يتم جلبه عبر API
+    const MERCHANT_ID = "9547143225EP";
+    const [sessionId, setSessionId] = useState<string | null>(null);
 
-    const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // تنظيف المدخلات وتنسيق الرقم (إضافة مسافة كل 4 أرقام)
-        let value = e.target.value.replace(/\D/g, '');
-        let formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-        if (formattedValue.length <= 19) { // 16 رقم + 3 مسافات
-            setCardData({ ...cardData, number: formattedValue });
+    useEffect(() => {
+        if (paymentMethod === 'visa') {
+            // محاكاة طلب الـ Session ID من السيرفر (Backend)
+            // في مشروعك، استبدل هذا بطلب API حقيقي للسيرفر الخاص بك
+            setSessionId('SESSION_ID_FROM_YOUR_SERVER'); 
+            
+            const interval = setInterval(() => {
+                const win = window as any;
+                if (win.PaymentSession) {
+                    clearInterval(interval);
+                    initializeGateway();
+                }
+            }, 500);
+            return () => clearInterval(interval);
         }
-    };
+    }, [paymentMethod]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        // قيود الطول للحقول الصغيرة
-        if (name === 'month' || name === 'year') {
-            if (value.length <= 2) setCardData({ ...cardData, [name]: value });
-        } else if (name === 'cvv') {
-            if (value.length <= 4) setCardData({ ...cardData, [name]: value });
-        } else {
-            setCardData({ ...cardData, [name]: value });
-        }
+    const initializeGateway = () => {
+        const win = window as any;
+        if (!win.PaymentSession) return;
+
+        win.PaymentSession.configure({
+            session: sessionId,
+            fields: {
+                card: {
+                    number: "#card-number-container",
+                    securityCode: "#security-code-container",
+                    expiryMonth: "#expiry-month-container",
+                    expiryYear: "#expiry-year-container"
+                }
+            },
+            frameEmbeddingRestriction: "NONE",
+            callbacks: {
+                initialized: (response: any) => {
+                    console.log("Mastercard Gateway Ready", response);
+                },
+                formSessionUpdate: (response: any) => {
+                    if (response.status === "ok") {
+                        // البنك قام بتحويل البيانات لـ Token (Session ID محدث)
+                        // الآن يجب إرسال هذا الـ ID للسيرفر لإتمام الخصم المالي
+                        handleFinalizeTransaction(response.session.id);
+                    } else if (response.status === "fields_in_error") {
+                        setError("الرجاء التأكد من صحة البيانات المدخلة في الحقول الحمراء.");
+                        setIsProcessing(false);
+                    } else {
+                        setError("حدث خطأ أثناء الاتصال بالبنك. يرجى المحاولة لاحقاً.");
+                        setIsProcessing(false);
+                    }
+                }
+            }
+        });
     };
 
     const handleConfirmPayment = (e: React.FormEvent) => {
@@ -57,24 +86,30 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
             return;
         }
 
-        // تحقق بسيط من البيانات قبل الإرسال
-        if (cardData.number.length < 16 || cardData.month === '' || cardData.year === '' || cardData.cvv.length < 3) {
-            setError("الرجاء التأكد من إكمال جميع بيانات البطاقة بشكل صحيح.");
-            return;
-        }
-
         setIsProcessing(true);
+        const win = window as any;
+        if (win.PaymentSession) {
+            // توجيه الطلب لماستركارد لمعالجة الحقول
+            win.PaymentSession.updateSessionFromForm('card');
+        } else {
+            setError("تعذر تشغيل بوابة الدفع، يرجى تحديث الصفحة.");
+            setIsProcessing(false);
+        }
+    };
 
-        // محاكاة الاتصال ببوابة ماستركارد (Production)
-        // في البيئة الحقيقية، هنا يتم إرسال البيانات مشفرة لسيرفر البنك
+    const handleFinalizeTransaction = (updatedSessionId: string) => {
+        // هنا يتم إرسال updatedSessionId للسيرفر الخاص بك
+        // وسيقوم السيرفر باستخدام apiPassword لتنفيذ العملية
+        console.log("Processing with updated session:", updatedSessionId);
+        
         setTimeout(() => {
             onEnroll(course, 'Success', { 
                 paymentMethod: 'Credit Card',
                 orderId: `ORD-${Date.now().toString().slice(-6)}`,
-                transactionId: `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+                transactionId: updatedSessionId
             });
             setIsProcessing(false);
-        }, 2500);
+        }, 2000);
     };
 
     return (
@@ -83,42 +118,40 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-black text-blue-900 mb-2">{strings.paymentTitle}</h1>
                     <div className="flex justify-center items-center gap-2">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">بوابة دفع جو توتر الآمنة</p>
+                        <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">بوابة دفع مشفرة وآمنة (Mastercard Gateway)</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* ملخص الطلب */}
+                    {/* الفاتورة */}
                     <div className="lg:col-span-4 space-y-6">
                         <div className="bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
                             <h2 className="font-black text-blue-900 mb-6 pb-4 border-b">ملخص الدورة</h2>
                             <div className="flex gap-4 mb-6">
-                                <img src={course.imageUrl} className="w-16 h-16 rounded-2xl object-cover shadow-sm" alt="" />
+                                <img src={course.imageUrl} className="w-16 h-16 rounded-2xl object-cover" alt="" />
                                 <div>
-                                    <h3 className="font-bold text-blue-900 text-sm leading-tight">{course.title}</h3>
+                                    <h3 className="font-bold text-blue-900 text-sm leading-tight line-clamp-2">{course.title}</h3>
                                     <p className="text-[10px] text-gray-400 mt-1 font-bold uppercase">{course.category}</p>
                                 </div>
                             </div>
-                            <div className="bg-gray-50 p-4 rounded-2xl space-y-3">
-                                <div className="flex justify-between text-xs font-bold text-blue-900">
-                                    <span>الإجمالي المستحق:</span>
-                                    <span className="text-xl font-black text-green-600">{course.priceJod || course.price} JOD</span>
+                            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-blue-900 font-black">الإجمالي:</span>
+                                    <span className="text-2xl font-black text-green-600">{course.priceJod || course.price} JOD</span>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="bg-blue-900 p-6 rounded-3xl text-white shadow-xl relative overflow-hidden">
-                            <div className="relative z-10">
-                                <p className="text-[10px] leading-relaxed opacity-80 font-bold">
-                                    نحن نستخدم تشفير 256-bit لضمان أمان بياناتك. يتم معالجة الدفع عبر Mastercard Gateway (Production).
-                                </p>
-                            </div>
-                            <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+                        <div className="p-6 bg-blue-900 rounded-3xl text-white shadow-xl flex items-center gap-4">
+                            <div className="text-3xl">🛡️</div>
+                            <p className="text-[10px] leading-relaxed opacity-90 font-bold">
+                                بياناتك المالية لا تمر عبر خوادمنا. يتم الدفع عبر بوابة البنك مباشرة بتشفير 256-bit.
+                            </p>
                         </div>
                     </div>
 
-                    {/* نموذج الدفع */}
+                    {/* الحقول البنكية */}
                     <div className="lg:col-span-8">
                         <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
                             <div className="flex gap-4 mb-8 bg-gray-50 p-2 rounded-2xl">
@@ -137,76 +170,44 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                             </div>
 
                             {paymentMethod === 'visa' ? (
-                                <form onSubmit={handleConfirmPayment} className="space-y-5 animate-fade-in">
-                                    {/* اسم صاحب البطاقة */}
+                                <form onSubmit={handleConfirmPayment} className="space-y-6 animate-fade-in">
+                                    {/* حقل اسم حامل البطاقة (حقل عادي) */}
                                     <div>
-                                        <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">اسم صاحب البطاقة</label>
+                                        <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">اسم حامل البطاقة</label>
                                         <input 
-                                            name="name"
                                             type="text" 
-                                            value={cardData.name}
-                                            onChange={handleInputChange}
                                             className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 font-bold transition-all" 
-                                            placeholder="الاسم كما يظهر على البطاقة" 
+                                            placeholder="John Doe" 
                                             required
                                         />
                                     </div>
 
-                                    {/* رقم البطاقة */}
+                                    {/* حقل رقم البطاقة (Bank Hosted) */}
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">رقم البطاقة</label>
-                                        <div className="relative">
-                                            <input 
-                                                type="tel" 
-                                                value={cardData.number}
-                                                onChange={handleCardNumberChange}
-                                                className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 font-bold tracking-widest transition-all" 
-                                                placeholder="0000 0000 0000 0000" 
-                                                required
-                                            />
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="" className="absolute left-4 top-1/2 -translate-y-1/2 h-6" />
+                                        <div id="card-number-container" className="mpgs-field-container relative">
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex gap-1 z-10 opacity-30 pointer-events-none">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="" className="h-4" />
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="" className="h-4" />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        {/* الشهر */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* الشهر (Bank Hosted) */}
                                         <div>
-                                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">الشهر</label>
-                                            <input 
-                                                name="month"
-                                                type="tel" 
-                                                value={cardData.month}
-                                                onChange={handleInputChange}
-                                                placeholder="MM"
-                                                className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold outline-none focus:ring-2 focus:ring-green-500" 
-                                                required
-                                            />
+                                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">شهر الانتهاء (MM)</label>
+                                            <div id="expiry-month-container" className="mpgs-field-container"></div>
                                         </div>
-                                        {/* السنة */}
+                                        {/* السنة (Bank Hosted) */}
                                         <div>
-                                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">السنة</label>
-                                            <input 
-                                                name="year"
-                                                type="tel" 
-                                                value={cardData.year}
-                                                onChange={handleInputChange}
-                                                placeholder="YY"
-                                                className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold outline-none focus:ring-2 focus:ring-green-500" 
-                                                required
-                                            />
+                                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">سنة الانتهاء (YY)</label>
+                                            <div id="expiry-year-container" className="mpgs-field-container"></div>
                                         </div>
-                                        {/* رمز الأمان */}
+                                        {/* رمز الأمان (Bank Hosted) */}
                                         <div>
                                             <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">الرمز (CVV)</label>
-                                            <input 
-                                                name="cvv"
-                                                type="password" 
-                                                value={cardData.cvv}
-                                                onChange={handleInputChange}
-                                                placeholder="***"
-                                                className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-center font-bold outline-none focus:ring-2 focus:ring-green-500" 
-                                                required
-                                            />
+                                            <div id="security-code-container" className="mpgs-field-container"></div>
                                         </div>
                                     </div>
 
@@ -224,19 +225,19 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                         {isProcessing ? (
                                             <>
                                                 <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                جاري المعالجة...
+                                                جاري معالجة الدفع...
                                             </>
                                         ) : (
-                                            `تأكيد ودفع ${course.priceJod || course.price} JOD`
+                                            `إتمام الدفع الآمن`
                                         )}
                                     </button>
                                 </form>
                             ) : (
-                                <div className="py-10 text-center animate-fade-in-up">
+                                <div className="py-10 text-center animate-fade-in">
                                     <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-black shadow-inner">Q</div>
                                     <h4 className="font-black text-blue-900 mb-2">الدفع عبر تطبيق CliQ</h4>
                                     <p className="text-xs text-gray-500 font-bold max-w-xs mx-auto leading-relaxed">
-                                        قم بتحويل المبلغ للاسم المستعار للمنصة، ثم اضغط على زر التفعيل أدناه ليقوم فريقنا بمراجعة العملية.
+                                        قم بالتحويل للاسم المستعار المعتمد لمنصة جوتوتر، ثم اضغط على زر التفعيل.
                                     </p>
                                     <button 
                                         onClick={handleConfirmPayment}
