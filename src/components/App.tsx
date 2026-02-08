@@ -82,7 +82,6 @@ const App: React.FC = () => {
     const [isDataLoading, setIsDataLoading] = useState(true);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-    // --- نظام التوجيه (Routing System) ---
     const parseHash = useCallback(() => {
         const hash = window.location.hash.replace('#/', '');
         if (!hash) {
@@ -95,7 +94,6 @@ const App: React.FC = () => {
         const route = parts[0] as Page;
         const id = parts[1] || null;
 
-        // دعم الروابط المختصرة لسهولة المشاركة
         const routeMap: Record<string, Page> = {
             'course': 'course-profile',
             'teacher': 'teacher-profile',
@@ -110,12 +108,11 @@ const App: React.FC = () => {
 
     useEffect(() => {
         window.addEventListener('hashchange', parseHash);
-        parseHash(); // تنفيذه عند أول تحميل
+        parseHash();
         return () => window.removeEventListener('hashchange', parseHash);
     }, [parseHash]);
 
     const handleNavigate = (newPage: Page, id: string | null = null) => {
-        // تحويل الصفحات الطويلة لروابط مختصرة وجميلة في الـ URL
         const reverseMap: Record<string, string> = {
             'course-profile': 'course',
             'teacher-profile': 'teacher',
@@ -134,7 +131,14 @@ const App: React.FC = () => {
         window.scrollTo(0, 0);
     };
 
-    // --- منطق البيانات والعرض ---
+    const handleCurrencyChange = () => {
+        setCurrency(current => {
+            if (current === 'JOD') return 'USD';
+            if (current === 'USD') return 'SAR';
+            return 'JOD';
+        });
+    };
+
     const displayedCourses = useMemo(() => {
         if (language === 'ar') return courses;
         return courses.map(c => ({
@@ -161,26 +165,6 @@ const App: React.FC = () => {
             qualifications: t.qualifications_en || t.qualifications,
         }));
     }, [teachers, language]);
-
-    const displayedBlog = useMemo(() => {
-        if (language === 'ar') return blogPosts;
-        return blogPosts.map(p => ({
-            ...p,
-            title: p.title_en || p.title,
-            excerpt: p.excerpt_en || p.excerpt,
-            content: p.content_en || p.content,
-            tags: p.tags_en || p.tags
-        }));
-    }, [blogPosts, language]);
-
-    const displayedHero = useMemo(() => {
-        if (language === 'ar') return heroSlides;
-        return heroSlides.map(s => ({
-            ...s,
-            title: s.title_en || s.title,
-            description: s.description_en || s.description
-        }));
-    }, [heroSlides, language]);
 
     const currentSiteContent = useMemo(() => {
         return language === 'en' ? siteContentEn : siteContent;
@@ -258,12 +242,12 @@ const App: React.FC = () => {
         if (isDataLoading || isAuthLoading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div></div>;
         
         switch (page) {
-            case 'home': return <><HeroSection onSignupClick={() => setAuthModalOpen(true)} heroSlides={displayedHero} strings={strings} /><FeaturesSection content={currentSiteContent.homepage} strings={strings} /><HowItWorks content={currentSiteContent.homepage} strings={strings} /><TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} isHomePageVersion={true} strings={strings} language={language} /><CoursesPreview content={currentSiteContent.homepage} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} onNavigate={handleNavigate} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} /><TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} /><AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} /></>;
+            case 'home': return <><HeroSection onSignupClick={() => setAuthModalOpen(true)} heroSlides={heroSlides} strings={strings} /><FeaturesSection content={currentSiteContent.homepage} strings={strings} /><HowItWorks content={currentSiteContent.homepage} strings={strings} /><TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} isHomePageVersion={true} strings={strings} language={language} /><CoursesPreview content={currentSiteContent.homepage} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} onNavigate={handleNavigate} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} /><TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} /><AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} /></>;
             case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={(v) => { if (isEnglishAdmin) setSiteContentEn(v); else setSiteContent(v); }} heroSlides={heroSlides} setHeroSlides={(v: any) => { const u = typeof v === 'function' ? v(heroSlides) : v; setHeroSlides(u); overwriteCollection('HeroSlides', u); }} onboardingOptions={onboardingOptions} setOnboardingOptions={(v: any) => { const u = typeof v === 'function' ? v(onboardingOptions) : v; setOnboardingOptions(u); updateConfig({ onboardingOptions: u }); }} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={(v: any) => { const u = typeof v === 'function' ? v(teachers) : v; setTeachers(u); overwriteCollection('Teachers', u); }} courses={courses} setCourses={(v: any) => { const u = typeof v === 'function' ? v(courses) : v; setCourses(u); overwriteCollection('Courses', u); }} testimonials={testimonials} setTestimonials={(v: any) => { const u = typeof v === 'function' ? v(testimonials) : v; setTestimonials(u); overwriteCollection('Testimonials', u); }} blogPosts={blogPosts} setBlogPosts={(v: any) => { const u = typeof v === 'function' ? v(blogPosts) : v; setBlogPosts(u); overwriteCollection('Blog', u); }} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
             case 'teachers': return <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} strings={strings} language={language}/>;
             case 'courses': return <CoursesPage courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
-            case 'blog': return <BlogPage posts={displayedBlog.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
-            case 'videos': return <VideosPage shorts={displayedBlog.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
+            case 'blog': return <BlogPage posts={blogPosts.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
+            case 'videos': return <VideosPage shorts={blogPosts.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
             case 'teacher-profile': return <TeacherProfilePage teacher={displayedTeachers.find(t => t.id === selectedId)!} strings={strings} language={language}/>;
             case 'course-profile': return <CourseProfilePage course={displayedCourses.find(c => c.id === selectedId)!} onBook={(id) => handleNavigate('payment', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} onEnroll={() => handleNavigate('dashboard')} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
@@ -281,7 +265,7 @@ const App: React.FC = () => {
     return (
         <div className={language === 'ar' ? 'rtl' : 'ltr'}>
             {showWelcomeModal && page === 'home' && <WelcomeModal onStartChat={() => setShowWelcomeModal(false)} onClose={() => setShowWelcomeModal(false)} />}
-            <Header onNavigate={handleNavigate} onLoginClick={() => setAuthModalOpen(true)} onSignupClick={() => setShowOnboarding(true)} isLoggedIn={isLoggedIn} isAdmin={isAdmin} username={userProfile?.username || 'Admin'} onLogout={() => auth?.signOut()} currency={currency} onCurrencyChange={() => setCurrency(c => c === 'JOD' ? 'USD' : 'JOD')} language={language} onLanguageChange={() => setShowLangConfirm(true)} isTranslating={isTranslating} strings={strings} />
+            <Header onNavigate={handleNavigate} onLoginClick={() => setAuthModalOpen(true)} onSignupClick={() => setShowOnboarding(true)} isLoggedIn={isLoggedIn} isAdmin={isAdmin} username={userProfile?.username || 'Admin'} onLogout={() => auth?.signOut()} currency={currency} onCurrencyChange={handleCurrencyChange} language={language} onLanguageChange={() => setShowLangConfirm(true)} isTranslating={isTranslating} strings={strings} />
             <main className="min-h-[70vh]">{renderContent()}</main>
             <Footer onNavigate={handleNavigate} strings={strings} />
             {isAuthModalOpen && <AuthModal initialView="login" onClose={() => setAuthModalOpen(false)} onLogin={async (e, p) => { try { await auth?.signInWithEmailAndPassword(e, p); setAuthModalOpen(false); return true; } catch { return false; } }} onSwitchToOnboarding={() => { setAuthModalOpen(false); setShowOnboarding(true); }} strings={strings} />}
