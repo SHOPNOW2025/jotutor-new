@@ -21,17 +21,22 @@
     ></script>
 
     <script type="text/javascript">
-        // دوال الاستجابة المطلوبة من مكتبة البنك لربطها بـ React
+        // تعريف الدوال المطلوبة من البنك بشكل عالمي لربطها بـ React
         function errorCallback(error) {
-            console.error("Mastercard Gateway Error:", JSON.stringify(error));
-            window.dispatchEvent(new CustomEvent('mpgs-payment-error', { detail: error }));
+            console.error("Mastercard SDK Error Details:", JSON.stringify(error));
+            // إرسال تنبيه للمتصفح ليقوم React باستلامه
+            window.dispatchEvent(new CustomEvent('mpgs-gateway-error', { detail: error }));
         }
         function cancelCallback() {
-            console.log('Payment cancelled by user');
-            window.dispatchEvent(new CustomEvent('mpgs-payment-cancel'));
+            console.warn('Payment process was cancelled by the user');
+            window.dispatchEvent(new CustomEvent('mpgs-gateway-cancel'));
         }
         function restoreFormFields() {
-            console.log('Restoring form fields from session...');
+            console.log('Restoring payment form fields...');
+        }
+        function completeCallback(resultIndicator, sessionVersion) {
+            console.log('Payment completed successfully', resultIndicator);
+            window.dispatchEvent(new CustomEvent('mpgs-gateway-success', { detail: { resultIndicator, sessionVersion } }));
         }
     </script>
 
@@ -55,10 +60,6 @@
       body { font-family: 'Cairo', sans-serif; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-      .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 
 <script type="importmap">
