@@ -46,13 +46,19 @@
         display: flex;
         align-items: center;
         transition: all 0.2s;
+        cursor: text;
       }
       .mpgs-field-container:focus-within {
         border-color: #84bc35;
         box-shadow: 0 0 0 4px rgba(132, 188, 53, 0.1);
       }
-      /* ضمان أن الـ iframe المولد من البنك يملأ الحاوية بالكامل */
-      iframe { width: 100% !important; height: 100% !important; border: none !important; }
+      /* ضمان أن الـ iframe المولد من البنك يملأ الحاوية بالكامل ويكون قابلاً للكتابة */
+      iframe { 
+        width: 100% !important; 
+        height: 100% !important; 
+        border: none !important; 
+        background: transparent !important;
+      }
       
       .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>

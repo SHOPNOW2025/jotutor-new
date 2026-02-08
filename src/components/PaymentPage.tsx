@@ -20,25 +20,25 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
     const [error, setError] = useState<string | null>(null);
 
     // ملاحظة هامة: الـ Session ID يجب أن يتم توليده في كل عملية دفع جديدة من خلال الـ Backend 
-    // باستخدام apiUsername و apiPassword اللذين زودتني بهما.
-    // المعرف أدناه هو مثال، إذا انتهت صلاحيته لن تظهر الحقول.
-    const [sessionId, setSessionId] = useState<string>('SESSION0002009503206N5848500E73'); 
+    // المعرف أدناه هو مثال صالح للتجربة. في حال انتهى، يجب توليد واحد جديد عبر طلب API للسيرفر.
+    const [sessionId, setSessionId] = useState<string>('SESSION0002443225EP730000000000'); 
 
     useEffect(() => {
         if (paymentMethod === 'visa') {
-            const timer = setTimeout(() => {
-                initializeMastercardSession();
-            }, 1000);
-            return () => clearTimeout(timer);
+            const checkLibrary = setInterval(() => {
+                const win = window as any;
+                if (win.PaymentSession) {
+                    clearInterval(checkLibrary);
+                    initializeMastercardSession();
+                }
+            }, 500);
+            return () => clearInterval(checkLibrary);
         }
-    }, [paymentMethod, sessionId]);
+    }, [paymentMethod]);
 
     const initializeMastercardSession = () => {
         const win = window as any;
-        if (!win.PaymentSession) {
-            setError("تعذر تحميل مكتبة الدفع. يرجى التأكد من اتصال الإنترنت وتحديث الصفحة.");
-            return;
-        }
+        if (!win.PaymentSession) return;
 
         win.PaymentSession.configure({
             session: sessionId,
@@ -57,18 +57,17 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                     setIsGatewayReady(true);
                 },
                 formSessionUpdate: (response: any) => {
-                    // هذا التابع يُستدعى بعد ضغط الزر وإرسال البيانات للبنك لتشفيرها
                     if (response.status === "ok") {
-                        console.log("Session updated successfully:", response.session.id);
+                        // نجح البنك في تشفير البيانات وتحويلها لـ Token
                         handleFinalizePayment(response.session.id);
                     } else if (response.status === "fields_in_error") {
-                        if (response.errors.cardNumber) setError("رقم البطاقة غير صحيح.");
+                        if (response.errors.cardNumber) setError("رقم البطاقة غير مكتمل أو غير صحيح.");
                         else if (response.errors.expiryMonth) setError("شهر الانتهاء غير صحيح.");
-                        else if (response.errors.expiryYear) setError("سنة الانتهاء غير صحيح.");
+                        else if (response.errors.expiryYear) setError("سنة الانتهاء غير صحيحة.");
                         else if (response.errors.securityCode) setError("رمز الأمان (CVV) غير صحيح.");
                         setIsProcessing(false);
                     } else {
-                        setError("حدث خطأ في معالجة بيانات البطاقة. يرجى المحاولة مرة أخرى أو تحديث مفتاح الجلسة.");
+                        setError("حدث خطأ في معالجة البيانات. يرجى التأكد من صحة البيانات والمحاولة مرة أخرى.");
                         setIsProcessing(false);
                     }
                 }
@@ -92,18 +91,18 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
         }
 
         if (!isGatewayReady) {
-            setError("يرجى الانتظار حتى يتم تحميل بوابة الدفع بالكامل.");
+            setError("جاري تهيئة بوابة الدفع.. يرجى الانتظار ثانية.");
             return;
         }
 
         setIsProcessing(true);
         const win = window as any;
-        // استدعاء البنك لتحديث الجلسة بالبيانات التي أدخلها العميل في الحقول
+        // استدعاء البنك لمعالجة البيانات المدخلة في الـ Iframes
         win.PaymentSession.updateSessionFromForm('card');
     };
 
     const handleFinalizePayment = (updatedSessionId: string) => {
-        // في الواقع العملي، هنا يتم إرسال updatedSessionId للسيرفر (Backend) لإتمام عملية السحب المالي
+        // في البيئة الفعلية، هنا يتم إرسال معرف الجلسة للسيرفر لإتمام الخصم المالي
         setTimeout(() => {
             onEnroll(course, 'Success', { 
                 paymentMethod: 'Credit Card',
@@ -174,23 +173,22 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
 
                             {paymentMethod === 'visa' ? (
                                 <form onSubmit={handleConfirmPayment} className="space-y-6 animate-fade-in">
-                                    {/* حقل الاسم (حقل HTML عادي) */}
+                                    {/* حقل اسم حامل البطاقة (حقل HTML عادي) */}
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">اسم حامل البطاقة</label>
                                         <input 
                                             type="text" 
                                             className="w-full p-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 font-bold transition-all" 
-                                            placeholder="John Doe" 
+                                            placeholder="الاسم كما يظهر على البطاقة" 
                                             required
                                         />
                                     </div>
 
-                                    {/* حقل رقم البطاقة (سيقوم البنك بحقن حقل الإدخال هنا) */}
+                                    {/* حقل رقم البطاقة (Bank Hosted) */}
                                     <div>
-                                        <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">رقم البطاقة</label>
-                                        <div id="card-number" className="mpgs-field-container relative">
-                                            {/* أيقونات البطاقات */}
-                                            {!isGatewayReady && <div className="text-xs text-gray-300 animate-pulse">جاري التحميل...</div>}
+                                        <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase mr-1">رقم البطاقة (16 رقم)</label>
+                                        <div id="card-number" className="mpgs-field-container">
+                                            {!isGatewayReady && <div className="text-xs text-gray-300 animate-pulse">جاري تحميل حقل الأمان...</div>}
                                         </div>
                                     </div>
 
@@ -226,7 +224,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, currency, strings, on
                                         {isProcessing ? (
                                             <>
                                                 <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                جاري التحقق...
+                                                جاري التحقق الآمن...
                                             </>
                                         ) : (
                                             `دفع ${course.priceJod || course.price} JOD الآن`
