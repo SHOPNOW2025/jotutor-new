@@ -8,7 +8,7 @@ import "firebase/compat/firestore";
 import { SiteContent, OnboardingOptions, Course, Payment } from './types';
 import { initialData } from './mockData';
 
-// Your web app's Firebase configuration from user prompt
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyD22o_UCJ7xrbawNuIlACvFtbQB9HeUn9g",
   authDomain: "jototur-2f755.firebaseapp.com",
@@ -34,21 +34,7 @@ try {
 export const auth = firebase.auth ? firebase.auth() : null;
 export const db = firebase.firestore ? firebase.firestore() : null;
 
-if (db) {
-    try {
-        db.enablePersistence().catch((err) => {
-            if (err.code === 'failed-precondition') {
-                console.warn("Firebase persistence failed: multiple tabs open");
-            } else if (err.code === 'unimplemented') {
-                console.warn("Firebase persistence is not supported in this browser");
-            }
-        });
-    } catch (e) {
-        console.warn("Firestore persistence init error", e);
-    }
-}
-
-// Map from the app's old sheet names to Firestore collection names (lowercase)
+// Map from the app's old sheet names to Firestore collection names
 const collectionMap: { [key: string]: string } = {
     'Users': 'users',
     'Teachers': 'teachers',
@@ -64,13 +50,13 @@ const publicCollections = ['Teachers', 'Courses', 'Testimonials', 'Blog', 'HeroS
 
 /**
  * Fetches all public data from Firestore collections.
+ * Now retrieves both siteContent and siteContentEn.
  */
 export const fetchPublicData = async (): Promise<{ success: boolean; data: any }> => {
     if (!db) return { success: false, data: {} };
     const data: { [key: string]: any } = {};
     const promises = [];
 
-    // Fetch all public collections
     for (const key of publicCollections) {
         const collectionName = collectionMap[key];
         const promise = db.collection(collectionName).get().then(snapshot => {
@@ -81,7 +67,6 @@ export const fetchPublicData = async (): Promise<{ success: boolean; data: any }
         promises.push(promise);
     }
     
-    // Fetch the single config document (also public)
     const configPromise = db.collection('config').doc('main').get().then(docSnap => {
         if (docSnap.exists) {
             data['config'] = docSnap.data();
@@ -96,28 +81,22 @@ export const fetchPublicData = async (): Promise<{ success: boolean; data: any }
     return { success: true, data };
 };
 
-const adminCollections = ['Users', 'Staff', 'Payments'];
-
-/**
- * Fetches all admin-only data from Firestore collections individually.
- */
 export const fetchAdminData = async (): Promise<{ success: boolean; data: any; failedCollections?: string[] }> => {
     if (!db) return { success: false, data: {} };
     const data: { [key: string]: any } = {};
     const failedCollections: string[] = [];
     
+    const adminCollections = ['Users', 'Staff', 'Payments'];
     for (const key of adminCollections) {
         const collectionName = collectionMap[key];
         try {
             const snapshot = await db.collection(collectionName).get();
             const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-            data[key] = docs; // Using sheet names as keys for compatibility with App.tsx state
+            data[key] = docs;
         } catch (error) {
-            console.error(`Failed to fetch collection '${collectionName}':`, error);
             failedCollections.push(key);
         }
     }
-    
     return { success: failedCollections.length === 0, data, failedCollections };
 };
 
@@ -126,14 +105,9 @@ export const onAuthStateChangedListener = (callback: (user: firebase.User | null
     return () => {};
 };
 
-/**
- * Overwrites an entire collection with a new set of data.
- */
 export const overwriteCollection = async (sheetName: string, newData: any[]): Promise<{ success: boolean; error?: string }> => {
     if (!db) return { success: false, error: 'Database not initialized' };
     const collectionName = collectionMap[sheetName];
-    if (!collectionName) return { success: false, error: 'Invalid collection name' };
-
     const batch = db.batch();
     const collectionRef = db.collection(collectionName);
 
@@ -149,40 +123,16 @@ export const overwriteCollection = async (sheetName: string, newData: any[]): Pr
         });
 
         existingIds.forEach(id => {
-            if (!newIds.has(id)) {
-                const docRef = collectionRef.doc(id);
-                batch.delete(docRef);
-            }
+            if (!newIds.has(id)) batch.delete(collectionRef.doc(id));
         });
     
         await batch.commit();
         return { success: true };
     } catch (error: any) {
-        console.error(`Error overwriting collection ${collectionName}:`, error);
         return { success: false, error: error.message };
     }
 };
 
-/**
- * Sets (creates or overwrites) a specific document in a collection.
- */
-export const setDocument = async (sheetName: string, docId: string, data: object): Promise<{ success: boolean; error?: string }> => {
-    if (!db) return { success: false, error: 'Database not initialized' };
-    const collectionName = collectionMap[sheetName];
-    if (!collectionName) return { success: false, error: 'Invalid collection name' };
-
-     try {
-        await db.collection(collectionName).doc(docId).set(data, { merge: true });
-        return { success: true };
-    } catch (error: any) {
-        console.error(`Error setting document in ${collectionName}:`, error);
-        return { success: false, error: error.message };
-    }
-};
-
-/**
- * Updates the 'main' document in the 'config' collection.
- */
 export const updateConfig = async (configData: { 
     siteContent?: SiteContent | null, 
     siteContentEn?: SiteContent | null,
@@ -193,13 +143,25 @@ export const updateConfig = async (configData: {
         await db.collection('config').doc('main').set(configData, { merge: true });
         return { success: true };
     } catch (error: any) {
-        console.error('Error updating config:', error);
         return { success: false, error: error.message };
     }
 };
 
+export const setDocument = async (sheetName: string, docId: string, data: object): Promise<{ success: boolean; error?: string }> => {
+    if (!db) return { success: false, error: 'Database not initialized' };
+    const collectionName = collectionMap[sheetName];
+     try {
+        await db.collection(collectionName).doc(docId).set(data, { merge: true });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+// Fix: Added missing export for seedInitialCourses function which was failing to import in ManageCourses.tsx.
 /**
  * Seeds the 'courses' collection with the initial data from mockData.ts.
+ * This will add or overwrite courses based on their IDs.
  */
 export const seedInitialCourses = async (): Promise<{ success: boolean; error?: string; seededCourses?: Course[] }> => {
     if (!db) return { success: false, error: 'Database not initialized' };
@@ -221,12 +183,4 @@ export const seedInitialCourses = async (): Promise<{ success: boolean; error?: 
         console.error(`Error seeding collection ${collectionName}:`, error);
         return { success: false, error: error.message };
     }
-};
-
-export const subscribeToPayments = (callback: (payments: Payment[]) => void) => {
-    if (!db) return () => {};
-    return db.collection('payments').onSnapshot(snapshot => {
-        const payments = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }) as Payment);
-        callback(payments);
-    });
 };

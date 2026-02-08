@@ -4,7 +4,6 @@ import { Course } from '../types';
 
 // Safely retrieve the API key. 
 // Vite replaces `process.env.API_KEY` during build, but accessing `process` object directly can crash browsers.
-// We check if process exists before accessing properties on it, or use the replaced string.
 const getEnvApiKey = () => {
     try {
         // @ts-ignore
@@ -23,11 +22,14 @@ export const setGeminiApiKey = (key: string) => {
 
 // Helper to lazily get the AI client
 const getAiClient = () => {
-    if (!dynamicApiKey) {
+    // Fix: API key is sourced from process.env.API_KEY as mandated by guidelines.
+    const apiKey = getEnvApiKey() || dynamicApiKey;
+    if (!apiKey) {
         console.warn("Gemini API Key is missing. AI features will be disabled until configured.");
         return null;
     }
-    return new GoogleGenAI({ apiKey: dynamicApiKey });
+    // Fix: Always use named parameter for apiKey initialization.
+    return new GoogleGenAI({ apiKey });
 };
 
 /**
@@ -43,7 +45,8 @@ export const generateLessonPlan = async (subject: string, level: string, topic: 
         return "عذرًا، خدمة الذكاء الاصطناعي غير متوفرة حاليًا. يرجى التأكد من إعداد مفتاح API.";
     }
 
-    const model = 'gemini-2.5-flash';
+    // Fix: Updated model to 'gemini-3-flash-preview' for basic text tasks.
+    const model = 'gemini-3-flash-preview';
 
     const prompt = `
         أنشئ خطة درس مفصلة باللغة العربية.
@@ -63,11 +66,13 @@ export const generateLessonPlan = async (subject: string, level: string, topic: 
     `;
 
     try {
+        // Fix: Use generateContent directly with both model and contents in parameters.
         const response = await ai.models.generateContent({
             model,
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: prompt,
         });
         
+        // Fix: Access response text property directly.
         return response.text || "لم يتم إنشاء محتوى.";
     } catch (error) {
         console.error('Error generating lesson plan:', error);
@@ -88,7 +93,8 @@ export const translateContent = async (content: object, targetLanguage: string):
         return content; // Return original content if AI is unavailable
     }
 
-    const model = 'gemini-2.5-pro'; // Use a powerful model for reliable JSON translation
+    // Fix: Updated model to 'gemini-3-pro-preview' for complex text translation tasks.
+    const model = 'gemini-3-pro-preview';
 
     const prompt = `
         You are an expert localization specialist. Translate all Arabic string values in the following JSON object to professional, natural-sounding ${targetLanguage}.
@@ -108,7 +114,7 @@ export const translateContent = async (content: object, targetLanguage: string):
     try {
         const response = await ai.models.generateContent({
             model,
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: prompt,
             config: {
                 responseMimeType: "application/json",
             },
@@ -140,7 +146,8 @@ export const getChatbotResponse = async (message: string, courses: Course[]): Pr
         };
     }
 
-    const model = 'gemini-2.5-flash';
+    // Fix: Updated model to 'gemini-3-flash-preview' for simple chatbot logic.
+    const model = 'gemini-3-flash-preview';
 
     // Prepare a lightweight course list for the AI, including the CURRICULUM
     const courseData = courses.map(c => ({
@@ -179,7 +186,7 @@ export const getChatbotResponse = async (message: string, courses: Course[]): Pr
     try {
         const response = await ai.models.generateContent({
             model,
-            contents: [{ parts: [{ text: prompt }] }],
+            contents: prompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
