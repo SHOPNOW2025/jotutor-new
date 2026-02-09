@@ -87,7 +87,7 @@ const App: React.FC = () => {
         window.scrollTo({
             top: 0,
             left: 0,
-            behavior: 'smooth' // إضافة تأثير تمرير ناعم
+            behavior: 'smooth'
         });
     }, [page, selectedId]);
 
@@ -268,7 +268,20 @@ const App: React.FC = () => {
         if (isDataLoading || isAuthLoading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div></div>;
         
         switch (page) {
-            case 'home': return <><HeroSection onSignupClick={() => setAuthModalOpen(true)} heroSlides={heroSlides} strings={strings} /><FeaturesSection content={currentSiteContent.homepage} strings={strings} /><HowItWorks content={currentSiteContent.homepage} strings={strings} /><TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} isHomePageVersion={true} strings={strings} language={language} /><CoursesPreview content={currentSiteContent.homepage} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} onNavigate={handleNavigate} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} /><TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} /><AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} /></>;
+            case 'home': return <>
+                <HeroSection 
+                    onSignupClick={() => setAuthModalOpen(true)} 
+                    heroSlides={heroSlides} 
+                    strings={strings} 
+                    language={language}
+                />
+                <FeaturesSection content={currentSiteContent.homepage} strings={strings} />
+                <HowItWorks content={currentSiteContent.homepage} strings={strings} />
+                <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} isHomePageVersion={true} strings={strings} language={language} />
+                <CoursesPreview content={currentSiteContent.homepage} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} onNavigate={handleNavigate} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} />
+                <TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} />
+                <AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} />
+            </>;
             case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={(v: any) => { const u = typeof v === 'function' ? v(heroSlides) : v; setHeroSlides(u); overwriteCollection('HeroSlides', u); }} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={(v: any) => { const u = typeof v === 'function' ? v(teachers) : v; setTeachers(u); overwriteCollection('Teachers', u); }} courses={courses} setCourses={(v: any) => { const u = typeof v === 'function' ? v(courses) : v; setCourses(u); overwriteCollection('Courses', u); }} testimonials={testimonials} setTestimonials={(v: any) => { const u = typeof v === 'function' ? v(testimonials) : v; setTestimonials(u); overwriteCollection('Testimonials', u); }} blogPosts={blogPosts} setBlogPosts={(v: any) => { const u = typeof v === 'function' ? v(blogPosts) : v; setBlogPosts(u); overwriteCollection('Blog', u); }} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
             case 'teachers': return <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} strings={strings} language={language}/>;
             case 'courses': return <CoursesPage courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;

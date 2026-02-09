@@ -1,17 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { HeroSlide, HomepageContent } from '../types';
+import { HeroSlide, HomepageContent, Language } from '../types';
 
 interface HeroSectionProps {
   onSignupClick: () => void;
   heroSlides: HeroSlide[];
   content?: HomepageContent;
   strings: { [key: string]: string };
+  language: Language;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [], content, strings }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [], content, strings, language }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const isEn = document.documentElement.lang === 'en';
+  const isEn = language === 'en';
 
   useEffect(() => {
     if (heroSlides.length <= 1) return;
