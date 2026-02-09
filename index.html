@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
   <head>
@@ -6,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JoTutor - Middle East 1st Tutors platform</title>
     
-    <!-- Fonts: Cairo -->
+    <!-- Fonts: Cairo (Arabic) & Jost (English - Futura PT alternative) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Jost:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Mastercard Hosted Session Script (Production Gateway for Merchant 9547143225EP) -->
+    <!-- Mastercard Hosted Session Script -->
     <script src="https://ap-gateway.mastercard.com/form/version/72/merchant/9547143225EP/session.js"></script>
 
     <!-- Tailwind CSS -->
@@ -24,18 +25,36 @@
               blue: { 800: '#00152e', 900: '#002146' },
               green: { 500: '#84bc35', 600: '#6a992a' }
             },
-            fontFamily: { sans: ['Cairo', 'sans-serif'] }
+            fontFamily: { 
+              sans: ['Cairo', 'sans-serif'],
+              english: ['Jost', 'sans-serif']
+            }
           }
         }
       }
     </script>
 
     <style>
-      body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+      /* نظام تبديل الخطوط التلقائي */
+      :root {
+        --font-arabic: 'Cairo', sans-serif;
+        --font-english: 'Jost', sans-serif;
+      }
+
+      html[lang="ar"], body[lang="ar"], .rtl { 
+        font-family: var(--font-arabic); 
+      }
+
+      html[lang="en"], body[lang="en"], .ltr { 
+        font-family: var(--font-english); 
+      }
+
+      body { margin: 0; padding: 0; transition: font-family 0.3s ease; }
+
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .animate-fade-in { animation: fadeIn 0.4s ease-out; }
       
-      /* تنسيقات حقول الدفع (Mastercard Hosted Fields) */
+      /* تنسيقات حقول الدفع */
       .mpgs-field-container { 
         height: 3.5rem; 
         background-color: #ffffff; 
@@ -52,7 +71,6 @@
         border-color: #84bc35;
         box-shadow: 0 0 0 4px rgba(132, 188, 53, 0.1);
       }
-      /* ضمان أن الـ iframe المولد من البنك يملأ الحاوية بالكامل */
       iframe { 
         width: 100% !important; 
         height: 100% !important; 
@@ -64,6 +82,11 @@
       }
       
       .no-scrollbar::-webkit-scrollbar { display: none; }
+      
+      /* تحسين مظهر الخط الإنجليزي للمحتوى */
+      html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] h3 {
+        letter-spacing: -0.02em;
+      }
     </style>
 
 <script type="importmap">

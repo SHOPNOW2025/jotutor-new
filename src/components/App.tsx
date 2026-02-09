@@ -82,6 +82,15 @@ const App: React.FC = () => {
     const [isDataLoading, setIsDataLoading] = useState(true);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
+    // --- نظام التمرير للأعلى عند تغيير الصفحة (Scroll to Top) ---
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth' // إضافة تأثير تمرير ناعم
+        });
+    }, [page, selectedId]);
+
     const parseHash = useCallback(() => {
         const hash = window.location.hash.replace('#/', '');
         if (!hash) {
@@ -128,7 +137,6 @@ const App: React.FC = () => {
         } else {
             window.location.hash = hash;
         }
-        window.scrollTo(0, 0);
     };
 
     const handleCurrencyChange = () => {
@@ -227,7 +235,6 @@ const App: React.FC = () => {
         setStrings(nextLang === 'ar' ? arStrings : enStrings);
     };
 
-    // --- نظام الحفظ المحدث لقاعدة البيانات ---
     const handleSetSiteContent = (newVal: React.SetStateAction<SiteContent>) => {
         if (isEnglishAdmin) {
             const updated = typeof newVal === 'function' ? (newVal as any)(siteContentEn) : newVal;
