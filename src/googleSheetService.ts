@@ -50,7 +50,6 @@ const publicCollections = ['Teachers', 'Courses', 'Testimonials', 'Blog', 'HeroS
 
 /**
  * Fetches all public data from Firestore collections.
- * Now retrieves both siteContent and siteContentEn.
  */
 export const fetchPublicData = async (): Promise<{ success: boolean; data: any }> => {
     if (!db) return { success: false, data: {} };
@@ -133,6 +132,9 @@ export const overwriteCollection = async (sheetName: string, newData: any[]): Pr
     }
 };
 
+/**
+ * Updates the 'main' document in the 'config' collection with merging.
+ */
 export const updateConfig = async (configData: { 
     siteContent?: SiteContent | null, 
     siteContentEn?: SiteContent | null,
@@ -140,9 +142,11 @@ export const updateConfig = async (configData: {
 }): Promise<{ success: boolean; error?: string }> => {
     if (!db) return { success: false, error: 'Database not initialized' };
     try {
+        // Crucial: Use merge: true to update only the keys provided (e.g., update EN without losing AR)
         await db.collection('config').doc('main').set(configData, { merge: true });
         return { success: true };
     } catch (error: any) {
+        console.error("Error updating Firestore config:", error);
         return { success: false, error: error.message };
     }
 };
@@ -158,10 +162,8 @@ export const setDocument = async (sheetName: string, docId: string, data: object
     }
 };
 
-// Fix: Added missing export for seedInitialCourses function which was failing to import in ManageCourses.tsx.
 /**
  * Seeds the 'courses' collection with the initial data from mockData.ts.
- * This will add or overwrite courses based on their IDs.
  */
 export const seedInitialCourses = async (): Promise<{ success: boolean; error?: string; seededCourses?: Course[] }> => {
     if (!db) return { success: false, error: 'Database not initialized' };
