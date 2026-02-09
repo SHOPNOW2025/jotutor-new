@@ -15,7 +15,7 @@ export interface HeroSlide {
   title: string;
   description: string;
   imageUrl: string;
-  // English version fields
+  imageUrl_en?: string; // صورة مخصصة للإنجليزي
   title_en?: string;
   description_en?: string;
 }
@@ -24,6 +24,7 @@ export interface Teacher {
   id: string;
   name: string;
   avatarUrl: string;
+  avatarUrl_en?: string; // صورة مخصصة للإنجليزي
   level: string;
   experience: number;
   specialties: string[];
@@ -32,7 +33,6 @@ export interface Teacher {
   pricePerHour: number;
   bio: string;
   qualifications: string[];
-  // English version fields
   name_en?: string;
   level_en?: string;
   bio_en?: string;
@@ -45,8 +45,8 @@ export interface Testimonial {
   name: string;
   role: string;
   avatarUrl: string;
+  avatarUrl_en?: string; // صورة مخصصة للإنجليزي
   quote: string;
-  // English version fields
   name_en?: string;
   role_en?: string;
   quote_en?: string;
@@ -64,6 +64,7 @@ export interface Course {
     duration: string;
     level: string;
     imageUrl: string;
+    imageUrl_en?: string; // صورة مخصصة للإنجليزي
     category: string;
     curriculum?: string;
     isFeatured?: boolean;
@@ -71,7 +72,6 @@ export interface Course {
     totalHours?: number;
     includedSubjects?: string;
     targetGrades?: string[];
-    // English version fields
     title_en?: string;
     description_en?: string;
     teacher_en?: string;
@@ -104,7 +104,6 @@ export interface OnboardingOptions {
     curriculums: string[];
     subjects: string[];
     languages: string[];
-    // English version lists
     serviceTypes_en?: string[];
     educationStages_en?: string[];
     curriculums_en?: string[];
@@ -115,7 +114,6 @@ export interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  // English version
   question_en?: string;
   answer_en?: string;
 }
@@ -128,10 +126,10 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   imageUrl: string;
+  imageUrl_en?: string; // صورة مخصصة للإنجليزي
   tags: string[];
   type: 'article' | 'short';
   youtubeVideoId?: string;
-  // English version fields
   title_en?: string;
   excerpt_en?: string;
   content_en?: string;
@@ -187,10 +185,12 @@ export interface HomepageContent {
 
 export interface AboutContent {
   heroImage: string;
+  heroImage_en?: string; // صورة مخصصة للإنجليزي
   aboutTitle: string;
   visionTitle: string;
   vision: string;
   visionImage: string;
+  visionImage_en?: string; // صورة مخصصة للإنجليزي
   missionTitle: string;
   mission: string;
   teacherCommunityTitle: string;

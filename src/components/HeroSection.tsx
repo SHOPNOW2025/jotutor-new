@@ -11,15 +11,16 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [], content, strings }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const isEn = document.documentElement.lang === 'en';
 
   useEffect(() => {
     if (heroSlides.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % heroSlides.length);
-    }, 5000); // Change image every 5 seconds
+    }, 5000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, [heroSlides]);
 
   const currentSlide = heroSlides[currentIndex];
@@ -84,7 +85,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [
                 key={index}
                 className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
                 style={{
-                  backgroundImage: `url(${slide.imageUrl})`,
+                  backgroundImage: `url(${isEn && slide.imageUrl_en ? slide.imageUrl_en : slide.imageUrl})`,
                   opacity: index === currentIndex ? 1 : 0,
                 }}
               />
@@ -94,10 +95,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [
 
         <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-32 flex flex-col items-center justify-center relative z-10">
           <div className="w-full max-w-4xl text-center">
-            {currentSlide && <Title text={currentSlide.title} />}
+            {currentSlide && <Title text={isEn && currentSlide.title_en ? currentSlide.title_en : currentSlide.title} />}
             {currentSlide && (
               <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-gray-200 max-w-2xl mx-auto px-4" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-                {currentSlide.description}
+                {isEn && currentSlide.description_en ? currentSlide.description_en : currentSlide.description}
               </p>
             )}
             <div className="mt-6 sm:mt-8 flex justify-center">
@@ -112,7 +113,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSignupClick, heroSlides = [
         </div>
       </section>
 
-      {/* Statistics Section - Optimized for Mobile Grid */}
       <div className="bg-gray-50 py-10 sm:py-16 border-b border-gray-200 relative z-20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 md:gap-12">
