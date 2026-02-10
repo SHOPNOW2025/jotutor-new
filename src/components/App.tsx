@@ -59,7 +59,7 @@ const App: React.FC = () => {
     const [isEnglishAdmin, setIsEnglishAdmin] = useState<boolean>(false);
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
-    const [showWelcomeModal, setShowWelcomeModal] = useState(true);
+    const [showWelcomeModal, setShowWelcomeModal] = useState(false); // Changed from true to false
     const [showLangConfirm, setShowLangConfirm] = useState(false);
     const [language, setLanguage] = useState<Language>('ar');
     const [strings, setStrings] = useState(arStrings);
