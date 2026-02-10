@@ -69,29 +69,107 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
     switch(activeTab) {
         case 'homepage':
             return (
-                <div className="space-y-6">
-                    <div className="p-4 border rounded bg-gray-50">
-                        <h3 className="font-bold mb-4 text-blue-900 uppercase text-xs">Section Titles</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input name="featuresTitle" value={localContent.homepage.featuresTitle} onChange={handleHomepageChange} className="p-2 border rounded" placeholder="Features Title"/>
-                            <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle} onChange={handleHomepageChange} className="p-2 border rounded" placeholder="Features Subtitle"></textarea>
+                <div className="space-y-10">
+                    {/* قسم الإحصائيات (الدوائر) */}
+                    <div className="p-6 border-2 border-green-100 rounded-3xl bg-green-50/30">
+                        <h3 className="font-black mb-6 text-blue-900 uppercase text-sm tracking-widest flex items-center gap-2">
+                            <span className="w-2 h-6 bg-green-500 rounded-full"></span>
+                            {isEnglishAdmin ? 'Homepage Stats (Circles)' : 'إحصائيات الصفحة الرئيسية (الدوائر)'}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="space-y-3 bg-white p-4 rounded-2xl shadow-sm">
+                                <label className="block text-[10px] font-black text-gray-400 uppercase">Stat 1: Tutors</label>
+                                <input name="statsTeacherCount" value={localContent.homepage.statsTeacherCount || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="Value (+750)"/>
+                                <input name="statsTeacherLabel" value={localContent.homepage.statsTeacherLabel || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" placeholder="Label (Tutors)"/>
+                            </div>
+                            <div className="space-y-3 bg-white p-4 rounded-2xl shadow-sm">
+                                <label className="block text-[10px] font-black text-gray-400 uppercase">Stat 2: Acceptance</label>
+                                <input name="statsAcceptanceRate" value={localContent.homepage.statsAcceptanceRate || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="Value (25%)"/>
+                                <input name="statsAcceptanceLabel" value={localContent.homepage.statsAcceptanceLabel || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" placeholder="Label (Acceptance)"/>
+                            </div>
+                            <div className="space-y-3 bg-white p-4 rounded-2xl shadow-sm">
+                                <label className="block text-[10px] font-black text-gray-400 uppercase">Stat 3: Students</label>
+                                <input name="statsStudentCount" value={localContent.homepage.statsStudentCount || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="Value (5000+)"/>
+                                <input name="statsStudentLabel" value={localContent.homepage.statsStudentLabel || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" placeholder="Label (Students)"/>
+                            </div>
+                            <div className="space-y-3 bg-white p-4 rounded-2xl shadow-sm">
+                                <label className="block text-[10px] font-black text-gray-400 uppercase">Stat 4: Satisfaction</label>
+                                <input name="statsSatisfactionRate" value={localContent.homepage.statsSatisfactionRate || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="Value (95%)"/>
+                                <input name="statsSatisfactionLabel" value={localContent.homepage.statsSatisfactionLabel || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" placeholder="Label (Satisfaction)"/>
+                            </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {[1, 2, 3].map(n => (
-                            <div key={n} className="p-3 border rounded bg-white">
-                                <h4 className="font-bold text-green-600 mb-2">Feature {n}</h4>
-                                <input name={`feature${n}Title` as any} value={(localContent.homepage as any)[`feature${n}Title`]} onChange={handleHomepageChange} className="w-full p-2 border rounded mb-2 text-sm" placeholder="Title"/>
-                                <textarea name={`feature${n}Desc` as any} value={(localContent.homepage as any)[`feature${n}Desc`]} onChange={handleHomepageChange} className="w-full p-2 border rounded text-sm" rows={3} placeholder="Description"></textarea>
+
+                    {/* لماذا تختار جو توتر */}
+                    <div className="p-6 border rounded-3xl bg-gray-50">
+                        <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest">Why Choose JoTutor? Section</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase">Main Title</label>
+                                <input name="featuresTitle" value={localContent.homepage.featuresTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl font-bold" placeholder="Features Title"/>
                             </div>
-                        ))}
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase">Subtitle</label>
+                                <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm" placeholder="Features Subtitle"></textarea>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[1, 2, 3].map(n => (
+                                <div key={n} className="p-4 border rounded-2xl bg-white shadow-sm">
+                                    <h4 className="font-black text-green-600 mb-3 text-xs">Feature Box {n}</h4>
+                                    <input name={`feature${n}Title` as any} value={(localContent.homepage as any)[`feature${n}Title`]} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg mb-2 text-sm font-bold" placeholder="Title"/>
+                                    <textarea name={`feature${n}Desc` as any} value={(localContent.homepage as any)[`feature${n}Desc`]} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" rows={3} placeholder="Description"></textarea>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="p-4 border rounded bg-gray-50">
-                         <h3 className="font-bold mb-4 text-blue-900 uppercase text-xs">Steps & Search</h3>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input name="howItWorksTitle" value={localContent.homepage.howItWorksTitle} onChange={handleHomepageChange} className="p-2 border rounded" placeholder="How it works title"/>
-                            <input name="teacherSearchTitle" value={localContent.homepage.teacherSearchTitle} onChange={handleHomepageChange} className="p-2 border rounded" placeholder="Teacher Search title"/>
+
+                    {/* كيف يعمل */}
+                    <div className="p-6 border rounded-3xl bg-gray-50">
+                         <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest">How It Works Section</h3>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <input name="howItWorksTitle" value={localContent.homepage.howItWorksTitle} onChange={handleHomepageChange} className="p-2 border rounded-xl font-bold" placeholder="Title"/>
+                            <input name="howItWorksSubtitle" value={localContent.homepage.howItWorksSubtitle} onChange={handleHomepageChange} className="p-2 border rounded-xl text-sm" placeholder="Subtitle"/>
                          </div>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {[1, 2, 3].map(n => (
+                                <div key={n} className="p-4 border rounded-2xl bg-white shadow-sm">
+                                    <h4 className="font-black text-blue-500 mb-3 text-xs">Step {n}</h4>
+                                    <input name={`step${n}Title` as any} value={(localContent.homepage as any)[`step${n}Title`]} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg mb-2 text-sm font-bold" placeholder="Step Title"/>
+                                    <textarea name={`step${n}Desc` as any} value={(localContent.homepage as any)[`step${n}Desc`]} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" rows={3} placeholder="Step Description"></textarea>
+                                </div>
+                            ))}
+                         </div>
+                    </div>
+
+                    {/* البحث والمعاينة */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-6 border rounded-3xl bg-white shadow-sm">
+                             <h3 className="font-black mb-4 text-blue-900 uppercase text-xs tracking-widest">Teacher Search</h3>
+                             <input name="teacherSearchTitle" value={localContent.homepage.teacherSearchTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl mb-3 font-bold" placeholder="Title"/>
+                             <textarea name="teacherSearchSubtitle" value={localContent.homepage.teacherSearchSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm mb-3" placeholder="Subtitle"></textarea>
+                             <input name="discoverMoreTeachers" value={localContent.homepage.discoverMoreTeachers} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-xs" placeholder="Button Label"/>
+                        </div>
+                        <div className="p-6 border rounded-3xl bg-white shadow-sm">
+                             <h3 className="font-black mb-4 text-blue-900 uppercase text-xs tracking-widest">Courses Preview</h3>
+                             <input name="coursesPreviewTitle" value={localContent.homepage.coursesPreviewTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl mb-3 font-bold" placeholder="Title"/>
+                             <textarea name="coursesPreviewSubtitle" value={localContent.homepage.coursesPreviewSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm mb-3" placeholder="Subtitle"></textarea>
+                             <input name="discoverMoreCourses" value={localContent.homepage.discoverMoreCourses} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-xs" placeholder="Button Label"/>
+                        </div>
+                    </div>
+
+                    {/* التقييمات ومخطط الدروس */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="p-6 border rounded-3xl bg-white shadow-sm">
+                             <h3 className="font-black mb-4 text-blue-900 uppercase text-xs tracking-widest">Testimonials Section</h3>
+                             <input name="testimonialsTitle" value={localContent.homepage.testimonialsTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl mb-3 font-bold" placeholder="Title"/>
+                             <textarea name="testimonialsSubtitle" value={localContent.homepage.testimonialsSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm" placeholder="Subtitle"></textarea>
+                        </div>
+                        <div className="p-6 border rounded-3xl bg-white shadow-sm">
+                             <h3 className="font-black mb-4 text-blue-900 uppercase text-xs tracking-widest">AI Lesson Planner Section</h3>
+                             <input name="aiPlannerTitle" value={localContent.homepage.aiPlannerTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl mb-3 font-bold" placeholder="Title"/>
+                             <textarea name="aiPlannerSubtitle" value={localContent.homepage.aiPlannerSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm" placeholder="Subtitle"></textarea>
+                        </div>
                     </div>
                 </div>
             );
@@ -143,20 +221,52 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
     }
   };
 
+  const tabs: { id: ContentTab, label: string }[] = [
+      { id: 'homepage', label: isEnglishAdmin ? 'Homepage Sections' : 'أقسام الصفحة الرئيسية' },
+      { id: 'about', label: isEnglishAdmin ? 'About Us' : 'عن المنصة' },
+      { id: 'faq', label: isEnglishAdmin ? 'FAQ' : 'الأسئلة الشائعة' },
+      { id: 'contact', label: isEnglishAdmin ? 'Contact Info' : 'معلومات التواصل' },
+      { id: 'privacy', label: isEnglishAdmin ? 'Privacy' : 'الخصوصية' },
+      { id: 'terms', label: isEnglishAdmin ? 'Terms' : 'الشروط' },
+      { id: 'paymentRefund', label: isEnglishAdmin ? 'Refund Policy' : 'سياسة الإرجاع' },
+  ];
+
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pb-20">
       <h1 className="text-3xl font-black text-blue-900 mb-6">{isEnglishAdmin ? 'English Site Management' : 'إدارة محتوى الموقع (عربي)'}</h1>
-      <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
-        <nav className="flex gap-2 overflow-x-auto border-b pb-4 mb-6 scrollbar-hide">
-            {(['homepage', 'about', 'faq', 'contact', 'privacy', 'terms', 'paymentRefund'] as ContentTab[]).map(t => (
-                <button key={t} onClick={() => setActiveTab(t)} className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${activeTab === t ? 'bg-blue-900 text-white shadow-lg' : 'text-gray-400 hover:bg-gray-50'}`}>{t.toUpperCase()}</button>
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100">
+        <nav className="flex gap-2 overflow-x-auto border-b pb-4 mb-8 scrollbar-hide no-scrollbar">
+            {tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} className={`px-6 py-3 rounded-2xl font-black text-xs transition-all whitespace-nowrap ${activeTab === t.id ? 'bg-blue-900 text-white shadow-xl' : 'text-gray-400 hover:bg-gray-50'}`}>
+                    {t.label.toUpperCase()}
+                </button>
             ))}
         </nav>
-        <div className="min-h-[400px]">{renderTabContent()}</div>
-        <div className="mt-8 pt-6 border-t flex justify-between items-center">
-            <button onClick={handleSaveChanges} className="bg-green-600 text-white font-black py-3 px-12 rounded-xl shadow-lg hover:bg-green-700 transition-all">{isEnglishAdmin ? 'Save English Content' : 'حفظ المحتوى العربي'}</button>
-            {status && <p className="text-green-600 font-bold">{status.message}</p>}
+        <div className="min-h-[500px]">{renderTabContent()}</div>
+        <div className="mt-12 pt-8 border-t flex justify-between items-center bg-gray-50 -mx-8 -mb-8 p-8 rounded-b-[2.5rem]">
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <div>
+                    <p className="text-xs font-black text-blue-900">{isEnglishAdmin ? 'Ready to Update' : 'جاهز للتحديث'}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{isEnglishAdmin ? 'Global Site Strings' : 'نصوص الموقع الرئيسية'}</p>
+                </div>
+            </div>
+            <button 
+                onClick={handleSaveChanges} 
+                className="bg-blue-900 text-white font-black py-4 px-16 rounded-2xl shadow-xl hover:bg-blue-800 transition-all transform active:scale-95"
+            >
+                {isEnglishAdmin ? 'Save Changes Now' : 'حفظ التغييرات الآن'}
+            </button>
         </div>
+        {status && (
+            <div className="fixed bottom-10 right-10 animate-bounce-in">
+                <div className="bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-black flex items-center gap-3">
+                    <span>✨</span> {status.message}
+                </div>
+            </div>
+        )}
       </div>
     </div>
   );
