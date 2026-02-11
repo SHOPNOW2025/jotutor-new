@@ -248,44 +248,45 @@ const App: React.FC = () => {
         setStrings(nextLang === 'ar' ? arStrings : enStrings);
     };
 
-    // --- وظائف المزامنة مع قاعدة البيانات (Handlers) ---
+    // --- وظائف المزامنة مع قاعدة البيانات (Handlers) المحسنة ---
     
-    const handleUpdateBlogPosts = useCallback((newPosts: React.SetStateAction<BlogPost[]>) => {
+    const handleUpdateBlogPosts = useCallback(async (newPosts: React.SetStateAction<BlogPost[]>) => {
         setBlogPosts(prev => {
             const updated = typeof newPosts === 'function' ? newPosts(prev) : newPosts;
-            overwriteCollection('Blog', updated).catch(e => console.error("Error syncing Blog:", e));
+            // تنفيذ الرفع في الخلفية لضمان عدم تأثر الواجهة
+            setTimeout(() => overwriteCollection('Blog', updated), 0);
             return updated;
         });
     }, []);
 
-    const handleUpdateCourses = useCallback((newCourses: React.SetStateAction<Course[]>) => {
+    const handleUpdateCourses = useCallback(async (newCourses: React.SetStateAction<Course[]>) => {
         setCourses(prev => {
             const updated = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
-            overwriteCollection('Courses', updated).catch(e => console.error("Error syncing Courses:", e));
+            setTimeout(() => overwriteCollection('Courses', updated), 0);
             return updated;
         });
     }, []);
 
-    const handleUpdateTeachers = useCallback((newTeachers: React.SetStateAction<Teacher[]>) => {
+    const handleUpdateTeachers = useCallback(async (newTeachers: React.SetStateAction<Teacher[]>) => {
         setTeachers(prev => {
             const updated = typeof newTeachers === 'function' ? newTeachers(prev) : newTeachers;
-            overwriteCollection('Teachers', updated).catch(e => console.error("Error syncing Teachers:", e));
+            setTimeout(() => overwriteCollection('Teachers', updated), 0);
             return updated;
         });
     }, []);
 
-    const handleUpdateHeroSlides = useCallback((newSlides: React.SetStateAction<HeroSlide[]>) => {
+    const handleUpdateHeroSlides = useCallback(async (newSlides: React.SetStateAction<HeroSlide[]>) => {
         setHeroSlides(prev => {
             const updated = typeof newSlides === 'function' ? newSlides(prev) : newSlides;
-            overwriteCollection('HeroSlides', updated).catch(e => console.error("Error syncing HeroSlides:", e));
+            setTimeout(() => overwriteCollection('HeroSlides', updated), 0);
             return updated;
         });
     }, []);
 
-    const handleUpdateTestimonials = useCallback((newTestimonials: React.SetStateAction<Testimonial[]>) => {
+    const handleUpdateTestimonials = useCallback(async (newTestimonials: React.SetStateAction<Testimonial[]>) => {
         setTestimonials(prev => {
             const updated = typeof newTestimonials === 'function' ? newTestimonials(prev) : newTestimonials;
-            overwriteCollection('Testimonials', updated).catch(e => console.error("Error syncing Testimonials:", e));
+            setTimeout(() => overwriteCollection('Testimonials', updated), 0);
             return updated;
         });
     }, []);

@@ -49,6 +49,26 @@ const collectionMap: { [key: string]: string } = {
 const publicCollections = ['Teachers', 'Courses', 'Testimonials', 'Blog', 'HeroSlides'];
 
 /**
+ * Removes undefined properties from an object recursively.
+ * Firestore does not accept undefined values.
+ */
+const cleanData = (obj: any): any => {
+    if (Array.isArray(obj)) {
+        return obj.map(cleanData);
+    } else if (obj !== null && typeof obj === 'object') {
+        const newObj: any = {};
+        Object.keys(obj).forEach(key => {
+            const val = cleanData(obj[key]);
+            if (val !== undefined) {
+                newObj[key] = val;
+            }
+        });
+        return newObj;
+    }
+    return obj;
+};
+
+/**
  * Fetches all public data from Firestore collections.
  */
 export const fetchPublicData = async (): Promise<{ success: boolean; data: any }> => {
@@ -111,11 +131,12 @@ export const overwriteCollection = async (sheetName: string, newData: any[]): Pr
     const collectionRef = db.collection(collectionName);
 
     try {
+        const cleanedData = cleanData(newData);
         const existingDocsSnapshot = await collectionRef.get();
         const existingIds = new Set(existingDocsSnapshot.docs.map(d => d.id));
-        const newIds = new Set(newData.map(item => item.id.toString()));
+        const newIds = new Set(cleanedData.map((item: any) => item.id.toString()));
 
-        newData.forEach(item => {
+        cleanedData.forEach((item: any) => {
             const { id, ...data } = item;
             const docRef = collectionRef.doc(id.toString());
             batch.set(docRef, data);
@@ -128,6 +149,7 @@ export const overwriteCollection = async (sheetName: string, newData: any[]): Pr
         await batch.commit();
         return { success: true };
     } catch (error: any) {
+        console.error(`Error overwriting ${collectionName}:`, error);
         return { success: false, error: error.message };
     }
 };
@@ -142,8 +164,8 @@ export const updateConfig = async (configData: {
 }): Promise<{ success: boolean; error?: string }> => {
     if (!db) return { success: false, error: 'Database not initialized' };
     try {
-        // Crucial: Use merge: true to update only the keys provided (e.g., update EN without losing AR)
-        await db.collection('config').doc('main').set(configData, { merge: true });
+        const cleaned = cleanData(configData);
+        await db.collection('config').doc('main').set(cleaned, { merge: true });
         return { success: true };
     } catch (error: any) {
         console.error("Error updating Firestore config:", error);
@@ -155,7 +177,8 @@ export const setDocument = async (sheetName: string, docId: string, data: object
     if (!db) return { success: false, error: 'Database not initialized' };
     const collectionName = collectionMap[sheetName];
      try {
-        await db.collection(collectionName).doc(docId).set(data, { merge: true });
+        const cleaned = cleanData(data);
+        await db.collection(collectionName).doc(docId).set(cleaned, { merge: true });
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
@@ -176,7 +199,7 @@ export const seedInitialCourses = async (): Promise<{ success: boolean; error?: 
         coursesToSeed.forEach(course => {
             const { id, ...data } = course;
             const docRef = collectionRef.doc(id.toString());
-            batch.set(docRef, data);
+            batch.set(docRef, cleanData(data));
         });
 
         await batch.commit();

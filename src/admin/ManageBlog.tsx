@@ -17,7 +17,7 @@ const extractYouTubeID = (url: string): string | null => {
 
 const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) => void; onClose: () => void; isEnglishAdmin?: boolean; }> = ({ post, onSave, onClose, isEnglishAdmin }) => {
     const [type, setType] = useState<'article' | 'short'>(post?.type || 'article');
-    const [youtubeUrl, setYoutubeUrl] = useState('');
+    const [youtubeUrl, setYoutubeUrl] = useState(post?.youtubeVideoId ? `https://www.youtube.com/watch?v=${post.youtubeVideoId}` : '');
     const [formData, setFormData] = useState<Partial<BlogPost>>({});
 
     useEffect(() => {
@@ -27,9 +27,8 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                 excerpt_en: post?.excerpt_en || '',
                 content_en: post?.content_en || '',
                 tags_en: post?.tags_en || [],
-                // Readonly refs
-                title: post?.title,
-                imageUrl: post?.imageUrl,
+                title: post?.title || '',
+                imageUrl: post?.imageUrl || '',
             });
         } else {
             setFormData({
@@ -39,7 +38,7 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                 content: post?.content || '',
                 imageUrl: post?.imageUrl || 'https://picsum.photos/seed/blog/800/400',
                 tags: post?.tags || [],
-                youtubeVideoId: post?.youtubeVideoId || undefined,
+                youtubeVideoId: post?.youtubeVideoId || '',
             });
         }
     }, [post, isEnglishAdmin]);
@@ -58,7 +57,7 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        let finalPostData: Partial<BlogPost> = {};
+        let finalPostData: any = { ...formData };
         
         if (!isEnglishAdmin && type === 'short') {
             const videoId = extractYouTubeID(youtubeUrl);
@@ -66,20 +65,18 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                 alert('الرجاء إدخال رابط يوتيوب صحيح.');
                 return;
             }
-            finalPostData = {
-                youtubeVideoId: videoId,
-                imageUrl: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-                content: formData.excerpt, 
-            };
+            finalPostData.youtubeVideoId = videoId;
+            finalPostData.imageUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+            finalPostData.content = formData.excerpt || ''; 
         }
 
         const finalPost: BlogPost = {
             ...(post || { id: Date.now().toString() } as BlogPost),
             date: post?.date || new Date().toISOString(),
-            type: type, // Type shouldn't change in English edit mode usually, but kept for simplicity
-            ...formData,
+            type: type,
             ...finalPostData,
         };
+        
         onSave(finalPost);
     };
 
@@ -87,10 +84,10 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit} className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6 text-right">
                         {isEnglishAdmin ? 'Edit Blog Post (English)' : (post ? 'تعديل المنشور' : 'إضافة منشور جديد')}
                     </h2>
-                    <div className="space-y-4">
+                    <div className="space-y-4 text-right" dir={isEnglishAdmin ? 'ltr' : 'rtl'}>
                         {!isEnglishAdmin && (
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">نوع المنشور</label>
@@ -103,8 +100,8 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                         
                         {isEnglishAdmin ? (
                             <>
-                                <div className="bg-gray-100 p-2 rounded text-xs mb-2">
-                                    <span className="text-gray-500">Arabic Title:</span> {formData.title || 'Not set'}
+                                <div className="bg-gray-100 p-2 rounded text-xs mb-2 text-left">
+                                    <span className="text-gray-500 font-bold">Arabic Title:</span> {formData.title || 'Not set'}
                                 </div>
                                 <input name="title_en" value={formData.title_en || ''} onChange={handleChange} placeholder="Title (English)" className="w-full p-2 border rounded" required />
                                 <textarea name="excerpt_en" value={formData.excerpt_en || ''} onChange={handleChange} placeholder="Excerpt/Short Description (English)" rows={3} className="w-full p-2 border rounded"></textarea>
@@ -123,15 +120,19 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                             </>
                         ) : (
                             <>
+                                <label className="block text-sm font-bold text-gray-600 mb-1">عنوان المقال</label>
                                 <input name="title" value={formData.title || ''} onChange={handleChange} placeholder="العنوان" className="w-full p-2 border rounded" required />
                                 
                                 {type === 'short' && (
-                                    <input type="url" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="رابط فيديو اليوتيوب (Short)" className="w-full p-2 border rounded" required />
+                                    <>
+                                        <label className="block text-sm font-bold text-gray-600 mb-1">رابط الفيديو</label>
+                                        <input type="url" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="رابط فيديو اليوتيوب (Short)" className="w-full p-2 border rounded" required />
+                                    </>
                                 )}
 
                                 {type === 'article' && (
                                      <div>
-                                        <label className="block text-sm text-gray-600 mb-1">صورة المقال</label>
+                                        <label className="block text-sm font-bold text-gray-600 mb-1">صورة المقال</label>
                                         <ImageUploadInput
                                             value={formData.imageUrl || ''}
                                             onChange={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
@@ -140,12 +141,17 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                                      </div>
                                 )}
                                
+                                <label className="block text-sm font-bold text-gray-600 mb-1">وصف مختصر</label>
                                 <textarea name="excerpt" value={formData.excerpt || ''} onChange={handleChange} placeholder={type === 'short' ? 'شرح الفيديو' : 'مقتطف من المقال'} rows={3} className="w-full p-2 border rounded"></textarea>
 
                                 {type === 'article' && (
-                                    <textarea name="content" value={formData.content || ''} onChange={handleChange} placeholder="المحتوى الكامل (يدعم HTML)" rows={10} className="w-full p-2 border rounded"></textarea>
+                                    <>
+                                        <label className="block text-sm font-bold text-gray-600 mb-1">محتوى المقال الكامل</label>
+                                        <textarea name="content" value={formData.content || ''} onChange={handleChange} placeholder="المحتوى الكامل (يدعم HTML)" rows={10} className="w-full p-2 border rounded"></textarea>
+                                    </>
                                 )}
                                 
+                                <label className="block text-sm font-bold text-gray-600 mb-1">الوسوم</label>
                                 <input name="tags" value={(formData.tags || []).join(', ')} onChange={handleTagsChange} placeholder="الوسوم (مفصولة بفاصلة)" className="w-full p-2 border rounded" />
                             </>
                         )}
@@ -155,7 +161,7 @@ const PostFormModal: React.FC<{ post: BlogPost | null; onSave: (post: BlogPost) 
                             {isEnglishAdmin ? 'Cancel' : 'إلغاء'}
                         </button>
                         <button type="submit" className="bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
-                            {isEnglishAdmin ? 'Save' : 'حفظ'}
+                            {isEnglishAdmin ? 'Save' : 'حفظ ونشر'}
                         </button>
                     </div>
                 </form>
@@ -179,11 +185,13 @@ const ManageBlog: React.FC<ManageBlogProps> = ({ posts, setPosts, isEnglishAdmin
     };
 
     const handleSavePost = (postToSave: BlogPost) => {
-        if (posts.some(p => p.id === postToSave.id)) {
-            setPosts(prev => prev.map(p => p.id === postToSave.id ? postToSave : p));
-        } else {
-            setPosts(prev => [postToSave, ...prev]);
-        }
+        setPosts(prev => {
+            const exists = prev.find(p => p.id === postToSave.id);
+            if (exists) {
+                return prev.map(p => p.id === postToSave.id ? postToSave : p);
+            }
+            return [postToSave, ...prev];
+        });
         handleCloseModal();
     };
 
@@ -194,7 +202,7 @@ const ManageBlog: React.FC<ManageBlogProps> = ({ posts, setPosts, isEnglishAdmin
     };
 
     return (
-        <div>
+        <div className="text-right">
             {isModalOpen && <PostFormModal post={editingPost} onSave={handleSavePost} onClose={handleCloseModal} isEnglishAdmin={isEnglishAdmin} />}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">{isEnglishAdmin ? 'Manage Blog (English)' : 'إدارة المدونة والفيديوهات'}</h1>
@@ -202,15 +210,15 @@ const ManageBlog: React.FC<ManageBlogProps> = ({ posts, setPosts, isEnglishAdmin
                     {isEnglishAdmin ? 'Add New Post' : 'إضافة منشور جديد'}
                 </button>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-lg shadow-md overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white">
+                    <table className="min-w-full bg-white text-right">
                         <thead className="bg-gray-100">
                             <tr>
-                                <th className="text-right py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Title' : 'العنوان'}</th>
-                                <th className="text-right py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Type' : 'النوع'}</th>
-                                <th className="text-right py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Date' : 'التاريخ'}</th>
-                                <th className="text-right py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Actions' : 'الإجراءات'}</th>
+                                <th className="py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Title' : 'العنوان'}</th>
+                                <th className="py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Type' : 'النوع'}</th>
+                                <th className="py-3 px-4 font-semibold text-sm">{isEnglishAdmin ? 'Date' : 'التاريخ'}</th>
+                                <th className="py-3 px-4 font-semibold text-sm text-center">{isEnglishAdmin ? 'Actions' : 'الإجراءات'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -221,15 +229,15 @@ const ManageBlog: React.FC<ManageBlogProps> = ({ posts, setPosts, isEnglishAdmin
                                     </td>
                                     <td className="py-3 px-4">
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${post.type === 'short' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}>
-                                            {post.type === 'short' ? 'Short/Video' : 'Article'}
+                                            {post.type === 'short' ? 'فيديو' : 'مقال'}
                                         </span>
                                     </td>
-                                    <td className="py-3 px-4">{new Date(post.date).toLocaleDateString()}</td>
-                                    <td className="py-3 px-4 whitespace-nowrap">
-                                        <button onClick={() => handleOpenModal(post)} className="text-blue-500 hover:underline mr-4">
+                                    <td className="py-3 px-4 text-xs text-gray-500">{new Date(post.date).toLocaleDateString()}</td>
+                                    <td className="py-3 px-4 whitespace-nowrap text-center">
+                                        <button onClick={() => handleOpenModal(post)} className="text-blue-500 hover:underline mx-2">
                                             {isEnglishAdmin ? 'Edit' : 'تعديل'}
                                         </button>
-                                        {!isEnglishAdmin && <button onClick={() => handleRemovePost(post.id)} className="text-red-500 hover:underline">حذف</button>}
+                                        {!isEnglishAdmin && <button onClick={() => handleRemovePost(post.id)} className="text-red-500 hover:underline mx-2">حذف</button>}
                                     </td>
                                 </tr>
                             ))}
