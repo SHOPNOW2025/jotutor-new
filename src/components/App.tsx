@@ -248,22 +248,70 @@ const App: React.FC = () => {
         setStrings(nextLang === 'ar' ? arStrings : enStrings);
     };
 
+    // --- وظائف المزامنة مع قاعدة البيانات (Handlers) ---
+    
+    const handleUpdateBlogPosts = useCallback((newPosts: React.SetStateAction<BlogPost[]>) => {
+        setBlogPosts(prev => {
+            const updated = typeof newPosts === 'function' ? newPosts(prev) : newPosts;
+            overwriteCollection('Blog', updated).catch(e => console.error("Error syncing Blog:", e));
+            return updated;
+        });
+    }, []);
+
+    const handleUpdateCourses = useCallback((newCourses: React.SetStateAction<Course[]>) => {
+        setCourses(prev => {
+            const updated = typeof newCourses === 'function' ? newCourses(prev) : newCourses;
+            overwriteCollection('Courses', updated).catch(e => console.error("Error syncing Courses:", e));
+            return updated;
+        });
+    }, []);
+
+    const handleUpdateTeachers = useCallback((newTeachers: React.SetStateAction<Teacher[]>) => {
+        setTeachers(prev => {
+            const updated = typeof newTeachers === 'function' ? newTeachers(prev) : newTeachers;
+            overwriteCollection('Teachers', updated).catch(e => console.error("Error syncing Teachers:", e));
+            return updated;
+        });
+    }, []);
+
+    const handleUpdateHeroSlides = useCallback((newSlides: React.SetStateAction<HeroSlide[]>) => {
+        setHeroSlides(prev => {
+            const updated = typeof newSlides === 'function' ? newSlides(prev) : newSlides;
+            overwriteCollection('HeroSlides', updated).catch(e => console.error("Error syncing HeroSlides:", e));
+            return updated;
+        });
+    }, []);
+
+    const handleUpdateTestimonials = useCallback((newTestimonials: React.SetStateAction<Testimonial[]>) => {
+        setTestimonials(prev => {
+            const updated = typeof newTestimonials === 'function' ? newTestimonials(prev) : newTestimonials;
+            overwriteCollection('Testimonials', updated).catch(e => console.error("Error syncing Testimonials:", e));
+            return updated;
+        });
+    }, []);
+
     const handleSetSiteContent = (newVal: React.SetStateAction<SiteContent>) => {
         if (isEnglishAdmin) {
-            const updated = typeof newVal === 'function' ? (newVal as any)(siteContentEn) : newVal;
-            setSiteContentEn(updated);
-            updateConfig({ siteContentEn: updated }).catch(e => console.error("Error saving EN config:", e));
+            setSiteContentEn(prev => {
+                const updated = typeof newVal === 'function' ? (newVal as any)(prev) : newVal;
+                updateConfig({ siteContentEn: updated }).catch(e => console.error("Error saving EN config:", e));
+                return updated;
+            });
         } else {
-            const updated = typeof newVal === 'function' ? (newVal as any)(siteContent) : newVal;
-            setSiteContent(updated);
-            updateConfig({ siteContent: updated }).catch(e => console.error("Error saving AR config:", e));
+            setSiteContent(prev => {
+                const updated = typeof newVal === 'function' ? (newVal as any)(prev) : newVal;
+                updateConfig({ siteContent: updated }).catch(e => console.error("Error saving AR config:", e));
+                return updated;
+            });
         }
     };
 
     const handleSetOnboardingOptions = (newVal: React.SetStateAction<OnboardingOptions>) => {
-        const updated = typeof newVal === 'function' ? newVal(onboardingOptions) : newVal;
-        setOnboardingOptions(updated);
-        updateConfig({ onboardingOptions: updated }).catch(e => console.error("Error saving onboarding options:", e));
+        setOnboardingOptions(prev => {
+            const updated = typeof newVal === 'function' ? newVal(prev) : newVal;
+            updateConfig({ onboardingOptions: updated }).catch(e => console.error("Error saving onboarding options:", e));
+            return updated;
+        });
     };
 
     const handleUpdateProfile = async (updatedProfile: UserProfile) => {
@@ -295,7 +343,7 @@ const App: React.FC = () => {
                 <TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} />
                 <AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} />
             </>;
-            case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={(v: any) => { const u = typeof v === 'function' ? v(heroSlides) : v; setHeroSlides(u); overwriteCollection('HeroSlides', u); }} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={(v: any) => { const u = typeof v === 'function' ? v(teachers) : v; setTeachers(u); overwriteCollection('Teachers', u); }} courses={courses} setCourses={(v: any) => { const u = typeof v === 'function' ? v(courses) : v; setCourses(u); overwriteCollection('Courses', u); }} testimonials={testimonials} setTestimonials={(v: any) => { const u = typeof v === 'function' ? v(testimonials) : v; setTestimonials(u); overwriteCollection('Testimonials', u); }} blogPosts={blogPosts} setBlogPosts={(v: any) => { const u = typeof v === 'function' ? v(blogPosts) : v; setBlogPosts(u); overwriteCollection('Blog', u); }} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
+            case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={handleUpdateHeroSlides} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={handleUpdateTeachers} courses={courses} setCourses={handleUpdateCourses} testimonials={testimonials} setTestimonials={handleUpdateTestimonials} blogPosts={blogPosts} setBlogPosts={handleUpdateBlogPosts} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
             case 'teachers': return <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} strings={strings} language={language}/>;
             case 'courses': return <CoursesPage courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'blog': return <BlogPage posts={displayedBlogPosts.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
