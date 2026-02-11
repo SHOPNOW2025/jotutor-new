@@ -59,7 +59,7 @@ const App: React.FC = () => {
     const [isEnglishAdmin, setIsEnglishAdmin] = useState<boolean>(false);
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [showOnboarding, setShowOnboarding] = useState(false);
-    const [showWelcomeModal, setShowWelcomeModal] = useState(false); // Changed from true to false
+    const [showWelcomeModal, setShowWelcomeModal] = useState(false); 
     const [showLangConfirm, setShowLangConfirm] = useState(false);
     const [language, setLanguage] = useState<Language>('ar');
     const [strings, setStrings] = useState(arStrings);
@@ -174,6 +174,19 @@ const App: React.FC = () => {
         }));
     }, [teachers, language]);
 
+    // منطق عرض المقالات بناءً على اللغة
+    const displayedBlogPosts = useMemo(() => {
+        if (language === 'ar') return blogPosts;
+        return blogPosts.map(p => ({
+            ...p,
+            title: p.title_en || p.title,
+            excerpt: p.excerpt_en || p.excerpt,
+            content: p.content_en || p.content,
+            imageUrl: p.imageUrl_en || p.imageUrl,
+            tags: p.tags_en && p.tags_en.length > 0 ? p.tags_en : p.tags
+        }));
+    }, [blogPosts, language]);
+
     const currentSiteContent = useMemo(() => {
         return language === 'en' ? siteContentEn : siteContent;
     }, [language, siteContent, siteContentEn]);
@@ -285,8 +298,8 @@ const App: React.FC = () => {
             case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={(v: any) => { const u = typeof v === 'function' ? v(heroSlides) : v; setHeroSlides(u); overwriteCollection('HeroSlides', u); }} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={(v: any) => { const u = typeof v === 'function' ? v(teachers) : v; setTeachers(u); overwriteCollection('Teachers', u); }} courses={courses} setCourses={(v: any) => { const u = typeof v === 'function' ? v(courses) : v; setCourses(u); overwriteCollection('Courses', u); }} testimonials={testimonials} setTestimonials={(v: any) => { const u = typeof v === 'function' ? v(testimonials) : v; setTestimonials(u); overwriteCollection('Testimonials', u); }} blogPosts={blogPosts} setBlogPosts={(v: any) => { const u = typeof v === 'function' ? v(blogPosts) : v; setBlogPosts(u); overwriteCollection('Blog', u); }} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
             case 'teachers': return <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} strings={strings} language={language}/>;
             case 'courses': return <CoursesPage courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
-            case 'blog': return <BlogPage posts={blogPosts.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
-            case 'videos': return <VideosPage shorts={blogPosts.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
+            case 'blog': return <BlogPage posts={displayedBlogPosts.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
+            case 'videos': return <VideosPage shorts={displayedBlogPosts.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
             case 'teacher-profile': return <TeacherProfilePage teacher={displayedTeachers.find(t => t.id === selectedId)!} strings={strings} language={language}/>;
             case 'course-profile': return <CourseProfilePage course={displayedCourses.find(c => c.id === selectedId)!} onBook={(id) => handleNavigate('payment', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} onEnroll={() => handleNavigate('dashboard')} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
@@ -297,6 +310,14 @@ const App: React.FC = () => {
             case 'terms': return <TermsPage content={currentSiteContent.terms} strings={strings} />;
             case 'privacy': return <PrivacyPolicyPage content={currentSiteContent.privacy} strings={strings} />;
             case 'payment-refund': return <PaymentRefundPage content={currentSiteContent.paymentRefundPolicy || ''} strings={strings} />;
+            case 'article': {
+                const post = displayedBlogPosts.find(p => p.id === selectedId);
+                return post ? <ArticlePage post={post} onBack={() => handleNavigate('blog')} strings={strings} language={language}/> : <div className="py-20 text-center">المقال غير موجود.</div>;
+            }
+            case 'short-player': {
+                const post = displayedBlogPosts.find(p => p.id === selectedId);
+                return post ? <ShortPlayerPage post={post} onBack={() => handleNavigate('videos')} strings={strings} language={language}/> : <div className="py-20 text-center">الفيديو غير موجود.</div>;
+            }
             default: return <div className="py-20 text-center">الصفحة المطلوبة غير موجودة.</div>;
         }
     };
