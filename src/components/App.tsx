@@ -82,7 +82,6 @@ const App: React.FC = () => {
     const [isDataLoading, setIsDataLoading] = useState(true);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-    // --- نظام التمرير للأعلى ---
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [page, selectedId]);
@@ -143,6 +142,7 @@ const App: React.FC = () => {
         }));
     }, [teachers, language]);
 
+    // Fix: Defined displayedBlogPosts memo to resolve "Cannot find name 'displayedBlogPosts'" errors.
     const displayedBlogPosts = useMemo(() => {
         if (language === 'ar') return blogPosts;
         return blogPosts.map(p => ({
@@ -150,8 +150,8 @@ const App: React.FC = () => {
             title: p.title_en || p.title,
             excerpt: p.excerpt_en || p.excerpt,
             content: p.content_en || p.content,
+            tags: p.tags_en || p.tags,
             imageUrl: p.imageUrl_en || p.imageUrl,
-            tags: p.tags_en && p.tags_en.length > 0 ? p.tags_en : p.tags
         }));
     }, [blogPosts, language]);
 
@@ -213,18 +213,17 @@ const App: React.FC = () => {
         setStrings(nextLang === 'ar' ? arStrings : enStrings);
     };
 
-    // وظيفة تسجيل الاشتراك في دورة (المعالجة النهائية للدفع)
     const handleEnrollInCourse = async (course: Course, status: 'Success' | 'Pending', details?: any) => {
         if (!userProfile) { 
-            alert("يرجى تسجيل الدخول أولاً لتتمكن من إتمام عملية الدفع."); 
+            alert("يرجى تسجيل الدخول أولاً."); 
             setAuthModalOpen(true); 
             return; 
         }
 
         try {
-            // 1. إنشاء سجل الدفعة
+            // 1. إنشاء سجل الدفعة ببيانات حقيقية من البوابة
             const newPayment: Payment = {
-                id: details?.transactionId || `PAY-${Date.now()}`,
+                id: details?.transactionId || `TX-${Date.now()}`,
                 date: new Date().toISOString(),
                 userId: userProfile.id,
                 userName: userProfile.username,
@@ -235,10 +234,10 @@ const App: React.FC = () => {
                 status: status,
                 paymentMethod: details?.paymentMethod || 'Credit Card',
                 gatewayOrderId: details?.orderId || `ORD-${Date.now()}`,
-                transactionId: details?.transactionId || `TX-${Date.now()}`
+                transactionId: details?.transactionId || `PAY-${Date.now()}`
             };
 
-            // 2. تحديث بروفايل المستخدم بالدورة الجديدة إذا كان الدفع فورياً (Credit Card)
+            // 2. تفعيل الدورة فوراً للطالب إذا نجح الدفع البنكي
             if (status === 'Success') {
                 const currentEnrolled = userProfile.enrolledCourses || [];
                 if (!currentEnrolled.includes(course.id)) {
@@ -251,24 +250,21 @@ const App: React.FC = () => {
                 }
             }
 
-            // 3. رفع سجل الدفعة للداتابيس
+            // 3. رفع السجل للقاعدة وتحديث الـ state المحلي للأدمن
             await setDocument('Payments', newPayment.id, newPayment);
-
-            // 4. تحديث قائمة الدفعات المحلية فوراً (ليراها الأدمين في لوحة التحكم)
             setPayments(prev => [newPayment, ...prev]);
 
-            // 5. التنبيه والتوجه للوحة التحكم
+            // 4. إظهار رسالة النجاح والتوجه للداشبورد
             if (status === 'Success') {
-                alert("✨ تم الدفع بنجاح! الدورة الآن متاحة في حسابك.");
+                alert("✨ تم تأكيد الدفع بنجاح من ماستركارد! يمكنك الآن البدء بالتعلم.");
             } else {
-                alert("📩 تم استلام طلبك (CliQ). سيقوم فريقنا بمراجعته وتفعيل الدورة يدوياً خلال ساعات.");
+                alert("📩 تم استلام طلب الدفع (CliQ). سيتم المراجعة والتفعيل يدوياً.");
             }
-            
             handleNavigate('dashboard');
 
         } catch (error) {
             console.error("Enrollment error:", error);
-            alert("عذراً، حدث خطأ أثناء معالجة الطلب. يرجى مراجعة الدعم الفني.");
+            alert("حدث خطأ تقني أثناء محاولة تسجيل الدفعة. يرجى التواصل مع الدعم.");
         }
     };
 

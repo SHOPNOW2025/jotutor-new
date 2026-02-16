@@ -7,13 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JoTutor - Middle East 1st Tutors platform</title>
     
-    <!-- Fonts: Cairo (Arabic) & Jost (English - Futura PT alternative) -->
+    <!-- Fonts: Cairo (Arabic) & Jost (English) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Jost:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Mastercard Hosted Session Script -->
-    <script src="https://ap-gateway.mastercard.com/form/version/72/merchant/9547143225EP/session.js"></script>
+    <!-- Mastercard Hosted Checkout Script (Production) -->
+    <script src="https://ap-gateway.mastercard.com/static/checkout/checkout.min.js" 
+            data-error="errorCallback" 
+            data-cancel="cancelCallback" 
+            data-complete="completeCallback">
+    </script>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,58 +39,16 @@
     </script>
 
     <style>
-      /* نظام تبديل الخطوط التلقائي */
       :root {
         --font-arabic: 'Cairo', sans-serif;
         --font-english: 'Jost', sans-serif;
       }
-
-      html[lang="ar"], body[lang="ar"], .rtl { 
-        font-family: var(--font-arabic); 
-      }
-
-      html[lang="en"], body[lang="en"], .ltr { 
-        font-family: var(--font-english); 
-      }
-
+      html[lang="ar"], body[lang="ar"], .rtl { font-family: var(--font-arabic); }
+      html[lang="en"], body[lang="en"], .ltr { font-family: var(--font-english); }
       body { margin: 0; padding: 0; transition: font-family 0.3s ease; }
-
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-      
-      /* تنسيقات حقول الدفع */
-      .mpgs-field-container { 
-        height: 3.5rem; 
-        background-color: #ffffff; 
-        border: 2px solid #e5e7eb; 
-        border-radius: 1rem;
-        padding: 0 0.75rem;
-        display: flex;
-        align-items: center;
-        transition: all 0.2s;
-        position: relative;
-        overflow: hidden;
-      }
-      .mpgs-field-container:focus-within {
-        border-color: #84bc35;
-        box-shadow: 0 0 0 4px rgba(132, 188, 53, 0.1);
-      }
-      iframe { 
-        width: 100% !important; 
-        height: 100% !important; 
-        border: none !important; 
-        background: transparent !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-      
       .no-scrollbar::-webkit-scrollbar { display: none; }
-      
-      /* تحسين مظهر الخط الإنجليزي للمحتوى */
-      html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] h3 {
-        letter-spacing: -0.02em;
-      }
     </style>
 
 <script type="importmap">
