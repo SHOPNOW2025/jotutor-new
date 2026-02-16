@@ -82,34 +82,18 @@ const App: React.FC = () => {
     const [isDataLoading, setIsDataLoading] = useState(true);
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
-    // --- نظام التمرير للأعلى عند تغيير الصفحة (Scroll to Top) ---
+    // --- نظام التمرير للأعلى ---
     useEffect(() => {
-        window.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [page, selectedId]);
 
     const parseHash = useCallback(() => {
         const hash = window.location.hash.replace('#/', '');
-        if (!hash) {
-            setPage('home');
-            setSelectedId(null);
-            return;
-        }
-
+        if (!hash) { setPage('home'); setSelectedId(null); return; }
         const parts = hash.split('/');
         const route = parts[0] as Page;
         const id = parts[1] || null;
-
-        const routeMap: Record<string, Page> = {
-            'course': 'course-profile',
-            'teacher': 'teacher-profile',
-            'article': 'article',
-            'short': 'short-player'
-        };
-
+        const routeMap: Record<string, Page> = { 'course': 'course-profile', 'teacher': 'teacher-profile', 'article': 'article', 'short': 'short-player' };
         const finalPage = routeMap[route] || route;
         setPage(finalPage as Page);
         setSelectedId(id);
@@ -122,29 +106,14 @@ const App: React.FC = () => {
     }, [parseHash]);
 
     const handleNavigate = (newPage: Page, id: string | null = null) => {
-        const reverseMap: Record<string, string> = {
-            'course-profile': 'course',
-            'teacher-profile': 'teacher',
-            'article': 'article',
-            'short-player': 'short'
-        };
-
+        const reverseMap: Record<string, string> = { 'course-profile': 'course', 'teacher-profile': 'teacher', 'article': 'article', 'short-player': 'short' };
         const routeName = reverseMap[newPage] || newPage;
         const hash = id ? `#/${routeName}/${id}` : `#/${routeName}`;
-        
-        if (newPage === 'home') {
-            window.location.hash = '#/';
-        } else {
-            window.location.hash = hash;
-        }
+        if (newPage === 'home') { window.location.hash = '#/'; } else { window.location.hash = hash; }
     };
 
     const handleCurrencyChange = () => {
-        setCurrency(current => {
-            if (current === 'JOD') return 'USD';
-            if (current === 'USD') return 'SAR';
-            return 'JOD';
-        });
+        setCurrency(current => { if (current === 'JOD') return 'USD'; if (current === 'USD') return 'SAR'; return 'JOD'; });
     };
 
     const displayedCourses = useMemo(() => {
@@ -174,7 +143,6 @@ const App: React.FC = () => {
         }));
     }, [teachers, language]);
 
-    // منطق عرض المقالات بناءً على اللغة
     const displayedBlogPosts = useMemo(() => {
         if (language === 'ar') return blogPosts;
         return blogPosts.map(p => ({
@@ -220,10 +188,7 @@ const App: React.FC = () => {
                 if (email === 'admin@jotutor.com' || email === 'eng@jotutor.com') {
                     setIsAdmin(true);
                     setIsSuperAdmin(email === 'admin@jotutor.com');
-                    if (email === 'eng@jotutor.com') {
-                        setIsEnglishAdmin(true);
-                        setLanguage('en'); setStrings(enStrings);
-                    }
+                    if (email === 'eng@jotutor.com') { setIsEnglishAdmin(true); setLanguage('en'); setStrings(enStrings); }
                     const response = await fetchAdminData();
                     if(response.success) {
                         setUsers(response.data.Users || []);
@@ -248,12 +213,65 @@ const App: React.FC = () => {
         setStrings(nextLang === 'ar' ? arStrings : enStrings);
     };
 
-    // --- وظائف المزامنة مع قاعدة البيانات (Handlers) المحسنة ---
-    
+    // وظيفة تسجيل الاشتراك في دورة (المعالجة النهائية للدفع)
+    const handleEnrollInCourse = async (course: Course, status: 'Success' | 'Pending', details?: any) => {
+        if (!userProfile) { alert("يرجى تسجيل الدخول أولاً."); setAuthModalOpen(true); return; }
+
+        try {
+            // 1. تحديث بروفايل المستخدم بالدورة الجديدة إذا كانت الحالة ناجحة
+            if (status === 'Success') {
+                const currentEnrolled = userProfile.enrolledCourses || [];
+                if (currentEnrolled.includes(course.id)) {
+                    alert("أنت مسجل في هذه الدورة بالفعل.");
+                    handleNavigate('dashboard');
+                    return;
+                }
+                const updatedProfile: UserProfile = {
+                    ...userProfile,
+                    enrolledCourses: [...currentEnrolled, course.id]
+                };
+                await setDocument('Users', userProfile.id, updatedProfile);
+                setUserProfile(updatedProfile);
+            }
+
+            // 2. إنشاء سجل الدفعة
+            const newPayment: Payment = {
+                id: details?.transactionId || `PAY-${Date.now()}`,
+                date: new Date().toISOString(),
+                userId: userProfile.id,
+                userName: userProfile.username,
+                courseId: course.id,
+                courseName: course.title,
+                amount: course.priceJod || course.price || 0,
+                currency: 'JOD',
+                status: status,
+                paymentMethod: details?.paymentMethod || 'Credit Card',
+                gatewayOrderId: details?.orderId || `ORD-${Date.now()}`,
+                transactionId: details?.transactionId || `TX-${Date.now()}`
+            };
+
+            // الرفع للداتابيس
+            await setDocument('Payments', newPayment.id, newPayment);
+
+            // تحديث الحالة المحلية فوراً ليراها الأدمين إذا كان فاتحاً للوحة
+            setPayments(prev => [newPayment, ...prev]);
+
+            if (status === 'Success') {
+                alert(`${strings.paymentSuccess} تم تفعيل الدورة في حسابك بنجاح.`);
+            } else {
+                alert("تم استلام طلب الدفع اليدوي (CliQ). سيتم تفعيل الدورة خلال 24 ساعة بعد التحقق.");
+            }
+            handleNavigate('dashboard');
+
+        } catch (error) {
+            console.error("Error during enrollment:", error);
+            alert("حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقاً.");
+        }
+    };
+
     const handleUpdateBlogPosts = useCallback(async (newPosts: React.SetStateAction<BlogPost[]>) => {
         setBlogPosts(prev => {
             const updated = typeof newPosts === 'function' ? newPosts(prev) : newPosts;
-            // تنفيذ الرفع في الخلفية لضمان عدم تأثر الواجهة
             setTimeout(() => overwriteCollection('Blog', updated), 0);
             return updated;
         });
@@ -271,22 +289,6 @@ const App: React.FC = () => {
         setTeachers(prev => {
             const updated = typeof newTeachers === 'function' ? newTeachers(prev) : newTeachers;
             setTimeout(() => overwriteCollection('Teachers', updated), 0);
-            return updated;
-        });
-    }, []);
-
-    const handleUpdateHeroSlides = useCallback(async (newSlides: React.SetStateAction<HeroSlide[]>) => {
-        setHeroSlides(prev => {
-            const updated = typeof newSlides === 'function' ? newSlides(prev) : newSlides;
-            setTimeout(() => overwriteCollection('HeroSlides', updated), 0);
-            return updated;
-        });
-    }, []);
-
-    const handleUpdateTestimonials = useCallback(async (newTestimonials: React.SetStateAction<Testimonial[]>) => {
-        setTestimonials(prev => {
-            const updated = typeof newTestimonials === 'function' ? newTestimonials(prev) : newTestimonials;
-            setTimeout(() => overwriteCollection('Testimonials', updated), 0);
             return updated;
         });
     }, []);
@@ -331,12 +333,7 @@ const App: React.FC = () => {
         
         switch (page) {
             case 'home': return <>
-                <HeroSection 
-                    onSignupClick={() => setAuthModalOpen(true)} 
-                    heroSlides={heroSlides} 
-                    strings={strings} 
-                    language={language}
-                />
+                <HeroSection onSignupClick={() => setAuthModalOpen(true)} heroSlides={heroSlides} strings={strings} language={language}/>
                 <FeaturesSection content={currentSiteContent.homepage} strings={strings} />
                 <HowItWorks content={currentSiteContent.homepage} strings={strings} />
                 <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} isHomePageVersion={true} strings={strings} language={language} />
@@ -344,14 +341,30 @@ const App: React.FC = () => {
                 <TestimonialsSection content={currentSiteContent.homepage} testimonials={testimonials} strings={strings} />
                 <AILessonPlanner content={currentSiteContent.homepage} strings={strings} language={language} />
             </>;
-            case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={handleUpdateHeroSlides} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={handleUpdateTeachers} courses={courses} setCourses={handleUpdateCourses} testimonials={testimonials} setTestimonials={handleUpdateTestimonials} blogPosts={blogPosts} setBlogPosts={handleUpdateBlogPosts} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async () => {}} />;
+            case 'admin-dashboard': return <AdminDashboard onLogout={() => { auth?.signOut(); handleNavigate('home'); }} content={isEnglishAdmin ? siteContentEn : siteContent} setContent={handleSetSiteContent} heroSlides={heroSlides} setHeroSlides={(v:any)=>handleUpdateHeroSlides(v)} onboardingOptions={onboardingOptions} setOnboardingOptions={handleSetOnboardingOptions} users={users} setUsers={setUsers} staff={staff} setStaff={setStaff} payments={payments} setPayments={setPayments} teachers={teachers} setTeachers={handleUpdateTeachers} courses={courses} setCourses={handleUpdateCourses} testimonials={testimonials} setTestimonials={(v:any)=>handleUpdateTestimonials(v)} blogPosts={blogPosts} setBlogPosts={handleUpdateBlogPosts} subjects={onboardingOptions.subjects} strings={strings} language={language} isEnglishAdmin={isEnglishAdmin} isSuperAdmin={isSuperAdmin} onToggleEnglishMode={() => { const next = !isEnglishAdmin; setIsEnglishAdmin(next); setLanguage(next ? 'en' : 'ar'); setStrings(next ? enStrings : arStrings); }} onActivateCourse={async (pid) => {
+                const pay = payments.find(p => p.id === pid);
+                if (pay) {
+                    const userRef = db!.collection('users').doc(pay.userId);
+                    const userSnap = await userRef.get();
+                    if (userSnap.exists) {
+                        const userData = userSnap.data() as UserProfile;
+                        const enrolled = userData.enrolledCourses || [];
+                        if (!enrolled.includes(pay.courseId)) {
+                            await userRef.update({ enrolledCourses: [...enrolled, pay.courseId] });
+                            await db!.collection('payments').doc(pid).update({ status: 'Success' });
+                            setPayments(prev => prev.map(p => p.id === pid ? { ...p, status: 'Success' } : p));
+                            alert("تم تفعيل الدورة للطالب بنجاح.");
+                        }
+                    }
+                }
+            }} />;
             case 'teachers': return <TeacherSearch content={currentSiteContent.homepage} teachers={displayedTeachers} subjects={onboardingOptions.subjects} onSelectTeacher={(id) => handleNavigate('teacher-profile', id)} strings={strings} language={language}/>;
             case 'courses': return <CoursesPage courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'blog': return <BlogPage posts={displayedBlogPosts.filter(p => p.type === 'article')} onSelectPost={(id) => handleNavigate('article', id)} strings={strings} language={language}/>;
             case 'videos': return <VideosPage shorts={displayedBlogPosts.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
             case 'teacher-profile': return <TeacherProfilePage teacher={displayedTeachers.find(t => t.id === selectedId)!} strings={strings} language={language}/>;
             case 'course-profile': return <CourseProfilePage course={displayedCourses.find(c => c.id === selectedId)!} onBook={(id) => handleNavigate('payment', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
-            case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} onEnroll={() => handleNavigate('dashboard')} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
+            case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} onEnroll={handleEnrollInCourse} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'dashboard': return userProfile ? <Dashboard userProfile={userProfile} onLogout={() => { auth?.signOut(); handleNavigate('home'); }} onUpdateProfile={handleUpdateProfile} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language} /> : <div className="py-20 text-center">يرجى تسجيل الدخول أولاً.</div>;
             case 'about': return <AboutPage content={currentSiteContent.about} strings={strings} />;
             case 'contact': return <ContactPage content={currentSiteContent.contact} strings={strings} />;
@@ -359,17 +372,14 @@ const App: React.FC = () => {
             case 'terms': return <TermsPage content={currentSiteContent.terms} strings={strings} />;
             case 'privacy': return <PrivacyPolicyPage content={currentSiteContent.privacy} strings={strings} />;
             case 'payment-refund': return <PaymentRefundPage content={currentSiteContent.paymentRefundPolicy || ''} strings={strings} />;
-            case 'article': {
-                const post = displayedBlogPosts.find(p => p.id === selectedId);
-                return post ? <ArticlePage post={post} onBack={() => handleNavigate('blog')} strings={strings} language={language}/> : <div className="py-20 text-center">المقال غير موجود.</div>;
-            }
-            case 'short-player': {
-                const post = displayedBlogPosts.find(p => p.id === selectedId);
-                return post ? <ShortPlayerPage post={post} onBack={() => handleNavigate('videos')} strings={strings} language={language}/> : <div className="py-20 text-center">الفيديو غير موجود.</div>;
-            }
+            case 'article': { const post = displayedBlogPosts.find(p => p.id === selectedId); return post ? <ArticlePage post={post} onBack={() => handleNavigate('blog')} strings={strings} language={language}/> : <div className="py-20 text-center">المقال غير موجود.</div>; }
+            case 'short-player': { const post = displayedBlogPosts.find(p => p.id === selectedId); return post ? <ShortPlayerPage post={post} onBack={() => handleNavigate('videos')} strings={strings} language={language}/> : <div className="py-20 text-center">الفيديو غير موجود.</div>; }
             default: return <div className="py-20 text-center">الصفحة المطلوبة غير موجودة.</div>;
         }
     };
+
+    const handleUpdateHeroSlides = useCallback(async (v: any) => { setHeroSlides(prev => { const u = typeof v === 'function' ? v(prev) : v; setTimeout(() => overwriteCollection('HeroSlides', u), 0); return u; }); }, []);
+    const handleUpdateTestimonials = useCallback(async (v: any) => { setTestimonials(prev => { const u = typeof v === 'function' ? v(prev) : v; setTimeout(() => overwriteCollection('Testimonials', u), 0); return u; }); }, []);
 
     return (
         <div className={language === 'ar' ? 'rtl' : 'ltr'}>
