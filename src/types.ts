@@ -15,7 +15,7 @@ export interface HeroSlide {
   title: string;
   description: string;
   imageUrl: string;
-  imageUrl_en?: string; // صورة مخصصة للإنجليزي
+  imageUrl_en?: string; 
   title_en?: string;
   description_en?: string;
 }
@@ -24,7 +24,7 @@ export interface Teacher {
   id: string;
   name: string;
   avatarUrl: string;
-  avatarUrl_en?: string; // صورة مخصصة للإنجليزي
+  avatarUrl_en?: string; 
   level: string;
   experience: number;
   specialties: string[];
@@ -45,7 +45,7 @@ export interface Testimonial {
   name: string;
   role: string;
   avatarUrl: string;
-  avatarUrl_en?: string; // صورة مخصصة للإنجليزي
+  avatarUrl_en?: string; 
   quote: string;
   name_en?: string;
   role_en?: string;
@@ -64,7 +64,7 @@ export interface Course {
     duration: string;
     level: string;
     imageUrl: string;
-    imageUrl_en?: string; // صورة مخصصة للإنجليزي
+    imageUrl_en?: string; 
     category: string;
     curriculum?: string;
     isFeatured?: boolean;
@@ -126,7 +126,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   imageUrl: string;
-  imageUrl_en?: string; // صورة مخصصة للإنجليزي
+  imageUrl_en?: string; 
   tags: string[];
   type: 'article' | 'short';
   youtubeVideoId?: string;
@@ -181,16 +181,25 @@ export interface HomepageContent {
   statsStudentLabel?: string;
   statsSatisfactionRate?: string;
   statsSatisfactionLabel?: string;
+  // English Stats
+  statsTeacherCount_en?: string;
+  statsTeacherLabel_en?: string;
+  statsAcceptanceRate_en?: string;
+  statsAcceptanceLabel_en?: string;
+  statsStudentCount_en?: string;
+  statsStudentLabel_en?: string;
+  statsSatisfactionRate_en?: string;
+  statsSatisfactionLabel_en?: string;
 }
 
 export interface AboutContent {
   heroImage: string;
-  heroImage_en?: string; // صورة مخصصة للإنجليزي
+  heroImage_en?: string; 
   aboutTitle: string;
   visionTitle: string;
   vision: string;
   visionImage: string;
-  visionImage_en?: string; // صورة مخصصة للإنجليزي
+  visionImage_en?: string; 
   missionTitle: string;
   mission: string;
   teacherCommunityTitle: string;
@@ -199,10 +208,18 @@ export interface AboutContent {
   whyJoTutor: string[];
 }
 
+export interface FooterContent {
+    description: string;
+    description_en: string;
+    rights: string;
+    rights_en: string;
+}
+
 export interface SiteContent {
   geminiApiKey?: string;
   homepage: HomepageContent;
   about: AboutContent;
+  footer?: FooterContent;
   faq: FAQItem[];
   contact: ContactContent;
   privacy: string;
