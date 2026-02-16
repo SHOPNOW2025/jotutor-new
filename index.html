@@ -12,10 +12,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Jost:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Global Mastercard Callbacks -->
+    <script type="text/javascript">
+            function errorCallback(error) {
+                  console.error("Mastercard Error:", JSON.stringify(error));
+                  if(window.handlePaymentError) window.handlePaymentError(error);
+            }
+            function cancelCallback() {
+                  console.log('Payment cancelled');
+                  if(window.handlePaymentCancel) window.handlePaymentCancel();
+            }
+            function completeCallback(resultIndicator, sessionVersion) {
+                  console.log('Payment complete');
+                  if(window.handlePaymentComplete) window.handlePaymentComplete(resultIndicator, sessionVersion);
+            }
+            function restoreFormFields() {
+                  console.log('Restoring form fields...');
+            }
+    </script>
+
     <!-- Mastercard Hosted Checkout Script (Production) -->
     <script src="https://ap-gateway.mastercard.com/static/checkout/checkout.min.js" 
+            data-afterRedirect="restoreFormFields" 
             data-error="errorCallback" 
-            data-cancel="cancelCallback" 
+            data-cancel="cancelCallback"
             data-complete="completeCallback">
     </script>
 
