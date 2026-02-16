@@ -215,26 +215,14 @@ const App: React.FC = () => {
 
     // وظيفة تسجيل الاشتراك في دورة (المعالجة النهائية للدفع)
     const handleEnrollInCourse = async (course: Course, status: 'Success' | 'Pending', details?: any) => {
-        if (!userProfile) { alert("يرجى تسجيل الدخول أولاً."); setAuthModalOpen(true); return; }
+        if (!userProfile) { 
+            alert("يرجى تسجيل الدخول أولاً لتتمكن من إتمام عملية الدفع."); 
+            setAuthModalOpen(true); 
+            return; 
+        }
 
         try {
-            // 1. تحديث بروفايل المستخدم بالدورة الجديدة إذا كانت الحالة ناجحة
-            if (status === 'Success') {
-                const currentEnrolled = userProfile.enrolledCourses || [];
-                if (currentEnrolled.includes(course.id)) {
-                    alert("أنت مسجل في هذه الدورة بالفعل.");
-                    handleNavigate('dashboard');
-                    return;
-                }
-                const updatedProfile: UserProfile = {
-                    ...userProfile,
-                    enrolledCourses: [...currentEnrolled, course.id]
-                };
-                await setDocument('Users', userProfile.id, updatedProfile);
-                setUserProfile(updatedProfile);
-            }
-
-            // 2. إنشاء سجل الدفعة
+            // 1. إنشاء سجل الدفعة
             const newPayment: Payment = {
                 id: details?.transactionId || `PAY-${Date.now()}`,
                 date: new Date().toISOString(),
@@ -250,22 +238,37 @@ const App: React.FC = () => {
                 transactionId: details?.transactionId || `TX-${Date.now()}`
             };
 
-            // الرفع للداتابيس
+            // 2. تحديث بروفايل المستخدم بالدورة الجديدة إذا كان الدفع فورياً (Credit Card)
+            if (status === 'Success') {
+                const currentEnrolled = userProfile.enrolledCourses || [];
+                if (!currentEnrolled.includes(course.id)) {
+                    const updatedProfile: UserProfile = {
+                        ...userProfile,
+                        enrolledCourses: [...currentEnrolled, course.id]
+                    };
+                    await setDocument('Users', userProfile.id, updatedProfile);
+                    setUserProfile(updatedProfile);
+                }
+            }
+
+            // 3. رفع سجل الدفعة للداتابيس
             await setDocument('Payments', newPayment.id, newPayment);
 
-            // تحديث الحالة المحلية فوراً ليراها الأدمين إذا كان فاتحاً للوحة
+            // 4. تحديث قائمة الدفعات المحلية فوراً (ليراها الأدمين في لوحة التحكم)
             setPayments(prev => [newPayment, ...prev]);
 
+            // 5. التنبيه والتوجه للوحة التحكم
             if (status === 'Success') {
-                alert(`${strings.paymentSuccess} تم تفعيل الدورة في حسابك بنجاح.`);
+                alert("✨ تم الدفع بنجاح! الدورة الآن متاحة في حسابك.");
             } else {
-                alert("تم استلام طلب الدفع اليدوي (CliQ). سيتم تفعيل الدورة خلال 24 ساعة بعد التحقق.");
+                alert("📩 تم استلام طلبك (CliQ). سيقوم فريقنا بمراجعته وتفعيل الدورة يدوياً خلال ساعات.");
             }
+            
             handleNavigate('dashboard');
 
         } catch (error) {
-            console.error("Error during enrollment:", error);
-            alert("حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقاً.");
+            console.error("Enrollment error:", error);
+            alert("عذراً، حدث خطأ أثناء معالجة الطلب. يرجى مراجعة الدعم الفني.");
         }
     };
 
