@@ -35,6 +35,14 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
     }));
   };
 
+  const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLocalContent(prev => ({
+        ...prev,
+        contact: { ...prev.contact, [name]: value }
+    }));
+  };
+
   const handleAboutChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === 'whyJoTutor') {
@@ -69,7 +77,7 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
 
   const handleSaveChanges = () => {
     onUpdate(localContent);
-    setStatus({ message: isEnglishAdmin ? 'English content saved!' : 'تم حفظ المحتوى العربي!', type: 'success' });
+    setStatus({ message: isEnglishAdmin ? 'English content saved!' : 'تم حفظ المحتوى بنجاح!', type: 'success' });
     setTimeout(() => setStatus(null), 3000);
   };
   
@@ -78,75 +86,107 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
         case 'homepage':
             return (
                 <div className="space-y-10">
-                    {/* قسم الإحصائيات (الدوائر) */}
                     <div className="p-6 border-2 border-green-100 rounded-3xl bg-green-50/30">
                         <h3 className="font-black mb-6 text-blue-900 uppercase text-sm tracking-widest flex items-center gap-2">
                             <span className="w-2 h-6 bg-green-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Homepage Stats (English Mode)' : 'إحصائيات الصفحة الرئيسية (الدوائر)'}
+                            {isEnglishAdmin ? 'Homepage Stats' : 'إحصائيات الصفحة الرئيسية'}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {[
-                                { id: 'Teacher', suffix: isEnglishAdmin ? '_en' : '' },
-                                { id: 'Acceptance', suffix: isEnglishAdmin ? '_en' : '' },
-                                { id: 'Student', suffix: isEnglishAdmin ? '_en' : '' },
-                                { id: 'Satisfaction', suffix: isEnglishAdmin ? '_en' : '' }
+                                { id: 'Teacher', type: 'Count' },
+                                { id: 'Acceptance', type: 'Rate' },
+                                { id: 'Student', type: 'Count' },
+                                { id: 'Satisfaction', type: 'Rate' }
                             ].map((stat, i) => (
                                 <div key={i} className="space-y-3 bg-white p-4 rounded-2xl shadow-sm">
-                                    <label className="block text-[10px] font-black text-gray-400 uppercase">Stat {i+1}: {stat.id}</label>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase">{stat.id}</label>
                                     <input 
-                                        name={`stats${stat.id}${stat.id === 'Acceptance' ? 'Rate' : stat.id === 'Satisfaction' ? 'Rate' : 'Count'}${stat.suffix}` as any} 
-                                        value={(localContent.homepage as any)[`stats${stat.id}${stat.id === 'Acceptance' ? 'Rate' : stat.id === 'Satisfaction' ? 'Rate' : 'Count'}${stat.suffix}`] || ''} 
+                                        name={`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}` as any} 
+                                        value={(localContent.homepage as any)[`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}`] || ''} 
                                         onChange={handleHomepageChange} 
                                         className="w-full p-2 border rounded-lg text-sm font-bold" 
-                                        placeholder={`Value (${isEnglishAdmin ? 'EN' : 'AR'})`}
+                                        placeholder="Value"
                                     />
                                     <input 
-                                        name={`stats${stat.id}Label${stat.suffix}` as any} 
-                                        value={(localContent.homepage as any)[`stats${stat.id}Label${stat.suffix}`] || ''} 
+                                        name={`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}` as any} 
+                                        value={(localContent.homepage as any)[`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}`] || ''} 
                                         onChange={handleHomepageChange} 
                                         className="w-full p-2 border rounded-lg text-xs" 
-                                        placeholder={`Label (${isEnglishAdmin ? 'EN' : 'AR'})`}
+                                        placeholder="Label"
                                     />
                                 </div>
                             ))}
-                        </div>
-                    </div>
-
-                    {/* الميزات */}
-                    <div className="p-6 border rounded-3xl bg-gray-50">
-                        <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest">Why Choose JoTutor? Section</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input name="featuresTitle" value={localContent.homepage.featuresTitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl font-bold" placeholder="Features Title"/>
-                            <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle} onChange={handleHomepageChange} className="w-full p-2 border rounded-xl text-sm" placeholder="Features Subtitle"></textarea>
                         </div>
                     </div>
                 </div>
             );
         case 'footer':
             return (
-                <div className="space-y-8 p-6 border rounded-3xl bg-gray-50">
-                    <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest">Footer Content (Bilingual)</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Arabic Side */}
-                        <div className="space-y-4">
-                            <div className="bg-white p-4 rounded-2xl shadow-sm">
-                                <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">وصف الفوتر (عربي)</label>
-                                <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" rows={4}></textarea>
+                <div className="space-y-8 animate-fade-in">
+                    {/* نصوص الفوتر */}
+                    <div className="p-6 border rounded-[2rem] bg-gray-50 space-y-6">
+                        <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
+                            <span className="w-2 h-4 bg-blue-500 rounded-full"></span>
+                            {isEnglishAdmin ? 'Footer Texts (Bilingual)' : 'نصوص الفوتر (ثنائي اللغة)'}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">وصف الفوتر (عربي)</label>
+                                    <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" rows={4}></textarea>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">حقوق النشر (عربي)</label>
+                                    <input name="rights" value={localContent.footer?.rights || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" />
+                                </div>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm">
-                                <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">حقوق النشر (عربي)</label>
-                                <input name="rights" value={localContent.footer?.rights || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" />
+                            <div className="space-y-4">
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Footer Description (EN)</label>
+                                    <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" rows={4}></textarea>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Copyright (EN)</label>
+                                    <input name="rights_en" value={localContent.footer?.rights_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" />
+                                </div>
                             </div>
                         </div>
-                        {/* English Side */}
-                        <div className="space-y-4">
-                            <div className="bg-white p-4 rounded-2xl shadow-sm">
-                                <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Footer Description (EN)</label>
-                                <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" rows={4}></textarea>
+                    </div>
+
+                    {/* روابط التواصل الاجتماعي */}
+                    <div className="p-6 border rounded-[2rem] bg-blue-50/30 space-y-6">
+                        <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
+                            <span className="w-2 h-4 bg-green-500 rounded-full"></span>
+                            {isEnglishAdmin ? 'Social Media Links' : 'روابط التواصل الاجتماعي'}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">FB</div>
+                                <div className="flex-1">
+                                    <label className="block text-[9px] font-black text-gray-400 uppercase">Facebook URL</label>
+                                    <input name="facebook" value={localContent.contact.facebook || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-blue-600 font-medium" placeholder="https://facebook.com/..." />
+                                </div>
                             </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm">
-                                <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Copyright Rights (EN)</label>
-                                <input name="rights_en" value={localContent.footer?.rights_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" />
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                                <div className="w-10 h-10 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center font-bold">IG</div>
+                                <div className="flex-1">
+                                    <label className="block text-[9px] font-black text-gray-400 uppercase">Instagram URL</label>
+                                    <input name="instagram" value={localContent.contact.instagram || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-pink-600 font-medium" placeholder="https://instagram.com/..." />
+                                </div>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                                <div className="w-10 h-10 bg-red-100 text-red-600 rounded-xl flex items-center justify-center font-bold">YT</div>
+                                <div className="flex-1">
+                                    <label className="block text-[9px] font-black text-gray-400 uppercase">YouTube URL</label>
+                                    <input name="youtube" value={localContent.contact.youtube || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-red-600 font-medium" placeholder="https://youtube.com/..." />
+                                </div>
+                            </div>
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                                <div className="w-10 h-10 bg-blue-50 text-blue-800 rounded-xl flex items-center justify-center font-bold">IN</div>
+                                <div className="flex-1">
+                                    <label className="block text-[9px] font-black text-gray-400 uppercase">LinkedIn URL</label>
+                                    <input name="linkedin" value={localContent.contact.linkedin || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-blue-800 font-medium" placeholder="https://linkedin.com/in/..." />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -200,7 +240,7 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
 
   const tabs: { id: ContentTab, label: string }[] = [
       { id: 'homepage', label: isEnglishAdmin ? 'Homepage' : 'الرئيسية' },
-      { id: 'footer', label: isEnglishAdmin ? 'Footer' : 'الفوتر' },
+      { id: 'footer', label: isEnglishAdmin ? 'Footer' : 'الفوتر والروابط' },
       { id: 'about', label: isEnglishAdmin ? 'About Us' : 'عن المنصة' },
       { id: 'faq', label: isEnglishAdmin ? 'FAQ' : 'الأسئلة' },
       { id: 'contact', label: isEnglishAdmin ? 'Contact' : 'التواصل' },
@@ -210,7 +250,7 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
 
   return (
     <div className="animate-fade-in pb-20">
-      <h1 className="text-3xl font-black text-blue-900 mb-6">{isEnglishAdmin ? 'English Site Management' : 'إدارة محتوى الموقع (عربي)'}</h1>
+      <h1 className="text-3xl font-black text-blue-900 mb-6">{isEnglishAdmin ? 'English Site Management' : 'إدارة محتوى الموقع'}</h1>
       <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100">
         <nav className="flex gap-2 overflow-x-auto border-b pb-4 mb-8 scrollbar-hide no-scrollbar">
             {tabs.map(t => (
@@ -228,7 +268,7 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                 {isEnglishAdmin ? 'Save Changes Now' : 'حفظ التغييرات الآن'}
             </button>
         </div>
-        {status && <div className="fixed bottom-10 right-10 bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-black">{status.message}</div>}
+        {status && <div className="fixed bottom-10 right-10 bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-black z-[100] animate-bounce">{status.message}</div>}
       </div>
     </div>
   );
