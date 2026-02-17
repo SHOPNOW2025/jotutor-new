@@ -12,32 +12,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Jost:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- تعريف الدوال المرجعية للدفع بشكل عالمي (Global) -->
+    <!-- الدوال المرجعية لربط البنك الحقيقي بالتطبيق -->
     <script type="text/javascript">
             function errorCallback(error) {
-                  console.error("Mastercard Gateway Error:", error);
+                  console.error("GATEWAY ERROR:", error);
                   if(window.reactPaymentHandler) window.reactPaymentHandler('error', error);
             }
             function cancelCallback() {
-                  console.log("Payment Cancelled by user");
+                  console.log("PAYMENT CANCELLED");
                   if(window.reactPaymentHandler) window.reactPaymentHandler('cancel');
             }
             function completeCallback(resultIndicator, sessionVersion) {
-                  console.log("Payment Success! Indicator:", resultIndicator);
+                  console.log("PAYMENT COMPLETE! ID:", resultIndicator);
+                  // في حالة النجاح، يتم إرسال إشارة للتطبيق لتفعيل الدورة فوراً
                   if(window.reactPaymentHandler) window.reactPaymentHandler('complete', {resultIndicator, sessionVersion});
-            }
-            function restoreFormFields() {
-                  console.log("Restoring card fields if needed...");
             }
     </script>
 
-    <!-- تحميل سكربت ماستركارد الرسمي للإنتاج -->
+    <!-- تحميل مكتبة ماستركارد الرسمية -->
     <script 
         src="https://ap-gateway.mastercard.com/static/checkout/checkout.min.js"
         data-error="errorCallback"
         data-cancel="cancelCallback"
-        data-complete="completeCallback"
-        data-afterRedirect="restoreFormFields">
+        data-complete="completeCallback">
     </script>
 
     <!-- Tailwind CSS -->
@@ -66,9 +63,9 @@
       body { margin: 0; padding: 0; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
       .animate-fade-in { animation: fadeIn 0.5s ease-out; }
-      .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+      .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 
 <script type="importmap">
