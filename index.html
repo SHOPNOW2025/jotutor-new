@@ -12,10 +12,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Jost:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- 1. تعريف الدوال العالمية قبل تحميل السكربت -->
+    <!-- 1. تعريف الدوال العالمية قبل تحميل السكربت لضمان الربط الصحيح -->
     <script type="text/javascript">
             window.errorCallback = function(error) {
                   console.error("Mastercard Gateway Error:", error);
+                  // إرسال تنبيه للمكون في React
                   if(window.reactPaymentHandler) window.reactPaymentHandler('error', error);
             };
             window.cancelCallback = function() {
