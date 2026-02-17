@@ -217,6 +217,7 @@ export interface FooterContent {
 
 export interface SiteContent {
   geminiApiKey?: string;
+  mastercardSessionId?: string;
   homepage: HomepageContent;
   about: AboutContent;
   footer?: FooterContent;

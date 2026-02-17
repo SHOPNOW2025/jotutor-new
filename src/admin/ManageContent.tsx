@@ -8,7 +8,7 @@ interface ManageContentProps {
   isEnglishAdmin?: boolean;
 }
 
-type ContentTab = 'homepage' | 'about' | 'faq' | 'contact' | 'footer' | 'privacy' | 'terms' | 'paymentRefund';
+type ContentTab = 'homepage' | 'about' | 'faq' | 'contact' | 'footer' | 'settings' | 'privacy' | 'terms' | 'paymentRefund';
 
 const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEnglishAdmin }) => {
   const [activeTab, setActiveTab] = useState<ContentTab>('homepage');
@@ -25,6 +25,11 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
         ...prev,
         homepage: { ...prev.homepage, [name]: value }
     }));
+  };
+
+  const handleSettingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setLocalContent(prev => ({ ...prev, [name]: value }));
   };
   
   const handleFooterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -86,7 +91,6 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
         case 'homepage':
             return (
                 <div className="space-y-10 animate-fade-in">
-                    {/* 1. قسم الإحصائيات */}
                     <div className="p-6 border-2 border-green-100 rounded-3xl bg-green-50/30">
                         <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
                             <span className="w-2 h-6 bg-green-500 rounded-full"></span>
@@ -101,130 +105,59 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                             ].map((stat, i) => (
                                 <div key={i} className="space-y-3 bg-white p-4 rounded-2xl shadow-sm border border-green-50">
                                     <label className="block text-[9px] font-black text-gray-400 uppercase">{stat.id}</label>
-                                    <input 
-                                        name={`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}` as any} 
-                                        value={(localContent.homepage as any)[`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}`] || ''} 
-                                        onChange={handleHomepageChange} 
-                                        className="w-full p-2 border rounded-lg text-sm font-bold text-green-600 outline-none focus:border-green-500" 
-                                        placeholder="Value (e.g. +750)"
-                                    />
-                                    <input 
-                                        name={`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}` as any} 
-                                        value={(localContent.homepage as any)[`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}`] || ''} 
-                                        onChange={handleHomepageChange} 
-                                        className="w-full p-2 border rounded-lg text-xs outline-none focus:border-green-500" 
-                                        placeholder="Label Text"
-                                    />
+                                    <input name={`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold text-green-600" />
+                                    <input name={`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" />
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* 2. قسم الميزات (لماذا JoTutor) */}
                     <div className="p-6 border-2 border-blue-100 rounded-3xl bg-blue-50/30">
                         <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
                             <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Features Section (Why JoTutor)' : 'قسم الميزات (لماذا JoTutor؟)'}
+                            {isEnglishAdmin ? 'Features Section' : 'قسم الميزات'}
                         </h3>
-                        <div className="grid grid-cols-1 gap-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-blue-900 uppercase">العنوان الرئيسي</label>
-                                    <input name="featuresTitle" value={localContent.homepage.featuresTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-blue-900 uppercase">العنوان الفرعي</label>
-                                    <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-sm" rows={1}></textarea>
-                                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input name="featuresTitle" value={localContent.homepage.featuresTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold" />
+                            <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-sm" rows={1}></textarea>
+                        </div>
+                    </div>
+                </div>
+            );
+        case 'settings':
+            return (
+                <div className="space-y-8 animate-fade-in">
+                    <div className="p-8 border-4 border-dashed border-blue-200 rounded-[2.5rem] bg-blue-50/30">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg">💳</div>
+                            <div>
+                                <h3 className="text-xl font-black text-blue-900 uppercase tracking-tighter">إعدادات بوابة ماستركارد</h3>
+                                <p className="text-xs text-gray-500 font-bold uppercase">Real-Time Gateway Session Controller</p>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                {[1, 2, 3].map(num => (
-                                    <div key={num} className="bg-white p-4 rounded-2xl border border-blue-50 space-y-3">
-                                        <label className="block text-[9px] font-black text-blue-400 uppercase">الميزة {num}</label>
-                                        <input name={`feature${num}Title` as any} value={(localContent.homepage as any)[`feature${num}Title`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="العنوان" />
-                                        <textarea name={`feature${num}Desc` as any} value={(localContent.homepage as any)[`feature${num}Desc`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" rows={3} placeholder="الوصف"></textarea>
-                                    </div>
-                                ))}
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-black text-blue-900 mb-2 uppercase tracking-widest">Active Mastercard Session ID</label>
+                                <input 
+                                    name="mastercardSessionId" 
+                                    value={localContent.mastercardSessionId || ''} 
+                                    onChange={handleSettingsChange} 
+                                    className="w-full p-5 bg-white border-2 border-blue-100 rounded-2xl outline-none focus:border-blue-600 font-mono text-blue-600 font-bold shadow-inner" 
+                                    placeholder="SESSION0002XXXXXXXXXXXXXX" 
+                                />
+                                <p className="mt-3 text-[10px] text-gray-400 font-bold leading-relaxed bg-white/50 p-3 rounded-lg border">
+                                    ملاحظة: هذا المعرف يتم استخراجه من لوحة تحكم التاجر. إذا انتهت صلاحيته، ستظهر للطلاب رسالة "Session Expired". قم بتوليد معرف جديد وضعه هنا ليعمل الدفع فوراً.
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* 3. قسم كيف يعمل (Steps) */}
-                    <div className="p-6 border-2 border-orange-100 rounded-3xl bg-orange-50/20">
-                        <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-6 bg-orange-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'How It Works (Steps)' : 'قسم كيف يعمل (الخطوات)'}
-                        </h3>
-                        <div className="grid grid-cols-1 gap-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-900 uppercase">العنوان الرئيسي</label>
-                                    <input name="howItWorksTitle" value={localContent.homepage.howItWorksTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-orange-900 uppercase">العنوان الفرعي</label>
-                                    <textarea name="howItWorksSubtitle" value={localContent.homepage.howItWorksSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-sm" rows={1}></textarea>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                {[1, 2, 3].map(num => (
-                                    <div key={num} className="bg-white p-4 rounded-2xl border border-orange-50 space-y-3">
-                                        <div className="w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-[10px] font-black">0{num}</div>
-                                        <input name={`step${num}Title` as any} value={(localContent.homepage as any)[`step${num}Title`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold" placeholder="عنوان الخطوة" />
-                                        <textarea name={`step${num}Desc` as any} value={(localContent.homepage as any)[`step${num}Desc`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" rows={3} placeholder="شرح الخطوة"></textarea>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 4. البحث والدورات (Search & Courses Preview) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="p-6 border-2 border-purple-100 rounded-3xl bg-purple-50/30">
-                            <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <span className="w-2 h-6 bg-purple-500 rounded-full"></span>
-                                {isEnglishAdmin ? 'Teacher Search Area' : 'منطقة البحث عن معلم'}
-                            </h3>
-                            <div className="space-y-4">
-                                <input name="teacherSearchTitle" value={localContent.homepage.teacherSearchTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold text-sm" placeholder="العنوان" />
-                                <textarea name="teacherSearchSubtitle" value={localContent.homepage.teacherSearchSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-xs" rows={2} placeholder="الوصف"></textarea>
-                                <input name="discoverMoreTeachers" value={localContent.homepage.discoverMoreTeachers || ''} onChange={handleHomepageChange} className="w-full p-3 border border-purple-200 bg-white rounded-xl font-black text-[10px] uppercase text-purple-600" placeholder="نص زر الاكتشاف" />
-                            </div>
-                        </div>
-                        <div className="p-6 border-2 border-indigo-100 rounded-3xl bg-indigo-50/30">
-                            <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <span className="w-2 h-6 bg-indigo-500 rounded-full"></span>
-                                {isEnglishAdmin ? 'Courses Preview Area' : 'منطقة عرض الدورات'}
-                            </h3>
-                            <div className="space-y-4">
-                                <input name="coursesPreviewTitle" value={localContent.homepage.coursesPreviewTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold text-sm" placeholder="العنوان" />
-                                <textarea name="coursesPreviewSubtitle" value={localContent.homepage.coursesPreviewSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-xs" rows={2} placeholder="الوصف"></textarea>
-                                <input name="discoverMoreCourses" value={localContent.homepage.discoverMoreCourses || ''} onChange={handleHomepageChange} className="w-full p-3 border border-indigo-200 bg-white rounded-xl font-black text-[10px] uppercase text-indigo-600" placeholder="نص زر الاكتشاف" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 5. الشهادات والمخطط الذكي (Testimonials & AI Planner) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="p-6 border-2 border-pink-100 rounded-3xl bg-pink-50/30">
-                            <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <span className="w-2 h-6 bg-pink-500 rounded-full"></span>
-                                {isEnglishAdmin ? 'Testimonials Section' : 'قسم الشهادات'}
-                            </h3>
-                            <div className="space-y-4">
-                                <input name="testimonialsTitle" value={localContent.homepage.testimonialsTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold text-sm" placeholder="العنوان" />
-                                <textarea name="testimonialsSubtitle" value={localContent.homepage.testimonialsSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-xs" rows={2} placeholder="الوصف"></textarea>
-                            </div>
-                        </div>
-                        <div className="p-6 border-2 border-cyan-100 rounded-3xl bg-cyan-50/30">
-                            <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                                <span className="w-2 h-6 bg-cyan-500 rounded-full"></span>
-                                {isEnglishAdmin ? 'AI Lesson Planner' : 'مخطط الدروس الذكي'}
-                            </h3>
-                            <div className="space-y-4">
-                                <input name="aiPlannerTitle" value={localContent.homepage.aiPlannerTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold text-sm" placeholder="العنوان" />
-                                <textarea name="aiPlannerSubtitle" value={localContent.homepage.aiPlannerSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-xs" rows={2} placeholder="الوصف"></textarea>
-                            </div>
+                    <div className="p-8 border rounded-[2.5rem] bg-gray-50/50">
+                        <h3 className="text-lg font-black text-blue-900 mb-4 uppercase">مفاتيح API أخرى</h3>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Google Gemini API Key</label>
+                            <input name="geminiApiKey" value={localContent.geminiApiKey || ''} onChange={handleSettingsChange} className="w-full p-3 border rounded-xl font-mono text-xs" type="password" />
                         </div>
                     </div>
                 </div>
@@ -232,81 +165,12 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
         case 'footer':
             return (
                 <div className="space-y-8 animate-fade-in">
-                    {/* نصوص الفوتر */}
                     <div className="p-6 border rounded-[2rem] bg-gray-50 space-y-6">
-                        <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-4 bg-blue-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Footer Texts (Bilingual)' : 'نصوص الفوتر (ثنائي اللغة)'}
-                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-4">
-                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                    <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">وصف الفوتر (عربي)</label>
-                                    <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" rows={4}></textarea>
-                                </div>
-                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                    <label className="block text-[10px] font-black text-green-600 mb-2 uppercase">حقوق النشر (عربي)</label>
-                                    <input name="rights" value={localContent.footer?.rights || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm text-right" dir="rtl" />
-                                </div>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                    <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Footer Description (EN)</label>
-                                    <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" rows={4}></textarea>
-                                </div>
-                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                                    <label className="block text-[10px] font-black text-blue-600 mb-2 uppercase">Copyright (EN)</label>
-                                    <input name="rights_en" value={localContent.footer?.rights_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" />
-                                </div>
-                            </div>
+                            <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" dir="rtl" rows={4} placeholder="وصف الفوتر بالعربي"></textarea>
+                            <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" rows={4} placeholder="Footer description in English"></textarea>
                         </div>
                     </div>
-
-                    {/* روابط التواصل الاجتماعي */}
-                    <div className="p-6 border rounded-[2rem] bg-blue-50/30 space-y-6">
-                        <h3 className="font-black text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-4 bg-green-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Social Media Links' : 'روابط التواصل الاجتماعي'}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold">FB</div>
-                                <div className="flex-1">
-                                    <label className="block text-[9px] font-black text-gray-400 uppercase">Facebook URL</label>
-                                    <input name="facebook" value={localContent.contact.facebook || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-blue-600 font-medium" placeholder="https://facebook.com/..." />
-                                </div>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                                <div className="w-10 h-10 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center font-bold">IG</div>
-                                <div className="flex-1">
-                                    <label className="block text-[9px] font-black text-gray-400 uppercase">Instagram URL</label>
-                                    <input name="instagram" value={localContent.contact.instagram || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-pink-600 font-medium" placeholder="https://instagram.com/..." />
-                                </div>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                                <div className="w-10 h-10 bg-red-100 text-red-600 rounded-xl flex items-center justify-center font-bold">YT</div>
-                                <div className="flex-1">
-                                    <label className="block text-[9px] font-black text-gray-400 uppercase">YouTube URL</label>
-                                    <input name="youtube" value={localContent.contact.youtube || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-red-600 font-medium" placeholder="https://youtube.com/..." />
-                                </div>
-                            </div>
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                                <div className="w-10 h-10 bg-blue-50 text-blue-800 rounded-xl flex items-center justify-center font-bold">IN</div>
-                                <div className="flex-1">
-                                    <label className="block text-[9px] font-black text-gray-400 uppercase">LinkedIn URL</label>
-                                    <input name="linkedin" value={localContent.contact.linkedin || ''} onChange={handleSocialChange} className="w-full p-1 border-b outline-none text-xs text-blue-800 font-medium" placeholder="https://linkedin.com/in/..." />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        case 'about':
-            return (
-                <div className="space-y-4">
-                    <input name="aboutTitle" value={localContent.about.aboutTitle} onChange={handleAboutChange} className="w-full p-2 border rounded" placeholder="Page Title"/>
-                    <textarea name="vision" value={localContent.about.vision} onChange={handleAboutChange} rows={3} className="w-full p-2 border rounded" placeholder="Vision"></textarea>
-                    <textarea name="mission" value={localContent.about.mission} onChange={handleAboutChange} rows={4} className="w-full p-2 border rounded" placeholder="Mission"></textarea>
                 </div>
             );
         case 'faq':
@@ -314,18 +178,8 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                 <div>
                     {localContent.faq.map(item => (
                         <div key={item.id} className="p-4 border rounded mb-4 bg-gray-50">
-                            <input 
-                                value={isEnglishAdmin ? (item.question_en || '') : item.question} 
-                                onChange={e => handleFaqChange(item.id, isEnglishAdmin ? 'question_en' : 'question', e.target.value)} 
-                                className="w-full p-2 border rounded mb-2 font-bold" 
-                                placeholder="Question"
-                            />
-                            <textarea 
-                                value={isEnglishAdmin ? (item.answer_en || '') : item.answer} 
-                                onChange={e => handleFaqChange(item.id, isEnglishAdmin ? 'answer_en' : 'answer', e.target.value)} 
-                                className="w-full p-2 border rounded" 
-                                placeholder="Answer"
-                            ></textarea>
+                            <input value={isEnglishAdmin ? (item.question_en || '') : item.question} onChange={e => handleFaqChange(item.id, isEnglishAdmin ? 'question_en' : 'question', e.target.value)} className="w-full p-2 border rounded mb-2 font-bold" />
+                            <textarea value={isEnglishAdmin ? (item.answer_en || '') : item.answer} onChange={e => handleFaqChange(item.id, isEnglishAdmin ? 'answer_en' : 'answer', e.target.value)} className="w-full p-2 border rounded"></textarea>
                         </div>
                     ))}
                     <button onClick={addFaqItem} className="bg-blue-500 text-white px-4 py-2 rounded">Add FAQ</button>
@@ -334,53 +188,4 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
         case 'contact':
             return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input name="email" value={localContent.contact.email} onChange={handleContactChange} className="p-2 border rounded" placeholder="Email"/>
-                    <input name="phone" value={localContent.contact.phone} onChange={handleContactChange} className="p-2 border rounded" placeholder="Phone"/>
-                </div>
-            );
-        case 'privacy':
-        case 'terms':
-        case 'paymentRefund':
-            const f = activeTab === 'privacy' ? 'privacy' : activeTab === 'terms' ? 'terms' : 'paymentRefundPolicy';
-            return <textarea value={(localContent as any)[f]} onChange={e => handleTextChange(e, f)} rows={15} className="w-full p-2 border rounded"></textarea>;
-        default: return null;
-    }
-  };
-
-  const tabs: { id: ContentTab, label: string }[] = [
-      { id: 'homepage', label: isEnglishAdmin ? 'Homepage' : 'الرئيسية' },
-      { id: 'footer', label: isEnglishAdmin ? 'Footer' : 'الفوتر والروابط' },
-      { id: 'about', label: isEnglishAdmin ? 'About Us' : 'عن المنصة' },
-      { id: 'faq', label: isEnglishAdmin ? 'FAQ' : 'الأسئلة' },
-      { id: 'contact', label: isEnglishAdmin ? 'Contact' : 'التواصل' },
-      { id: 'privacy', label: isEnglishAdmin ? 'Privacy' : 'الخصوصية' },
-      { id: 'terms', label: isEnglishAdmin ? 'Terms' : 'الشروط' },
-  ];
-
-  return (
-    <div className="animate-fade-in pb-20">
-      <h1 className="text-3xl font-black text-blue-900 mb-6">{isEnglishAdmin ? 'English Site Management' : 'إدارة محتوى الموقع'}</h1>
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100">
-        <nav className="flex gap-2 overflow-x-auto border-b pb-4 mb-8 scrollbar-hide no-scrollbar">
-            {tabs.map(t => (
-                <button key={t.id} onClick={() => setActiveTab(t.id)} className={`px-6 py-3 rounded-2xl font-black text-xs transition-all whitespace-nowrap ${activeTab === t.id ? 'bg-blue-900 text-white shadow-xl' : 'text-gray-400 hover:bg-gray-50'}`}>
-                    {t.label.toUpperCase()}
-                </button>
-            ))}
-        </nav>
-        <div className="min-h-[500px]">{renderTabContent()}</div>
-        <div className="mt-12 pt-8 border-t flex justify-between items-center bg-gray-50 -mx-8 -mb-8 p-8 rounded-b-[2.5rem]">
-            <button 
-                onClick={handleSaveChanges} 
-                className="bg-blue-900 text-white font-black py-4 px-16 rounded-2xl shadow-xl hover:bg-blue-800 transition-all transform active:scale-95"
-            >
-                {isEnglishAdmin ? 'Save Changes Now' : 'حفظ التغييرات الآن'}
-            </button>
-        </div>
-        {status && <div className="fixed bottom-10 right-10 bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-black z-[100] animate-bounce">{status.message}</div>}
-      </div>
-    </div>
-  );
-};
-
-export default ManageContent;
+                    <input name="email" value={localContent.contact.email} onChange={handleContactChange} className="p-

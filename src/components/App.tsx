@@ -142,7 +142,6 @@ const App: React.FC = () => {
         }));
     }, [teachers, language]);
 
-    // Fix: Defined displayedBlogPosts memo to resolve "Cannot find name 'displayedBlogPosts'" errors.
     const displayedBlogPosts = useMemo(() => {
         if (language === 'ar') return blogPosts;
         return blogPosts.map(p => ({
@@ -221,7 +220,6 @@ const App: React.FC = () => {
         }
 
         try {
-            // 1. إنشاء سجل الدفعة ببيانات حقيقية من البوابة
             const newPayment: Payment = {
                 id: details?.transactionId || `TX-${Date.now()}`,
                 date: new Date().toISOString(),
@@ -237,7 +235,6 @@ const App: React.FC = () => {
                 transactionId: details?.transactionId || `PAY-${Date.now()}`
             };
 
-            // 2. تفعيل الدورة فوراً للطالب إذا نجح الدفع البنكي
             if (status === 'Success') {
                 const currentEnrolled = userProfile.enrolledCourses || [];
                 if (!currentEnrolled.includes(course.id)) {
@@ -250,11 +247,9 @@ const App: React.FC = () => {
                 }
             }
 
-            // 3. رفع السجل للقاعدة وتحديث الـ state المحلي للأدمن
             await setDocument('Payments', newPayment.id, newPayment);
             setPayments(prev => [newPayment, ...prev]);
 
-            // 4. إظهار رسالة النجاح والتوجه للداشبورد
             if (status === 'Success') {
                 alert("✨ تم تأكيد الدفع بنجاح من ماستركارد! يمكنك الآن البدء بالتعلم.");
             } else {
@@ -363,7 +358,7 @@ const App: React.FC = () => {
             case 'videos': return <VideosPage shorts={displayedBlogPosts.filter(p => p.type === 'short')} onSelectShort={(id) => handleNavigate('short-player', id)} strings={strings} language={language}/>;
             case 'teacher-profile': return <TeacherProfilePage teacher={displayedTeachers.find(t => t.id === selectedId)!} strings={strings} language={language}/>;
             case 'course-profile': return <CourseProfilePage course={displayedCourses.find(c => c.id === selectedId)!} onBook={(id) => handleNavigate('payment', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
-            case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} onEnroll={handleEnrollInCourse} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
+            case 'payment': return <PaymentPage course={displayedCourses.find(c => c.id === selectedId)!} siteContent={currentSiteContent} onEnroll={handleEnrollInCourse} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language}/>;
             case 'dashboard': return userProfile ? <Dashboard userProfile={userProfile} onLogout={() => { auth?.signOut(); handleNavigate('home'); }} onUpdateProfile={handleUpdateProfile} courses={displayedCourses} onSelectCourse={(id) => handleNavigate('course-profile', id)} currency={currency} exchangeRate={JOD_TO_USD_RATE} strings={strings} language={language} /> : <div className="py-20 text-center">يرجى تسجيل الدخول أولاً.</div>;
             case 'about': return <AboutPage content={currentSiteContent.about} strings={strings} />;
             case 'contact': return <ContactPage content={currentSiteContent.contact} strings={strings} />;
