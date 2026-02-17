@@ -12,27 +12,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Jost:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- 1. تعريف الدوال العالمية قبل تحميل السكربت لضمان الربط الصحيح -->
+    <!-- تعريف الدوال المرجعية للدفع بشكل عالمي (Global) -->
     <script type="text/javascript">
-            window.errorCallback = function(error) {
-                  console.error("Mastercard Gateway Error:", error);
-                  // إرسال تنبيه للمكون في React
+            function errorCallback(error) {
+                  console.log("Payment Error:", JSON.stringify(error));
                   if(window.reactPaymentHandler) window.reactPaymentHandler('error', error);
-            };
-            window.cancelCallback = function() {
+            }
+            function cancelCallback() {
                   console.log("Payment Cancelled");
                   if(window.reactPaymentHandler) window.reactPaymentHandler('cancel');
-            };
-            window.completeCallback = function(resultIndicator, sessionVersion) {
-                  console.log("Payment Success");
+            }
+            function completeCallback(resultIndicator, sessionVersion) {
+                  console.log("Payment Complete:", resultIndicator);
                   if(window.reactPaymentHandler) window.reactPaymentHandler('complete', {resultIndicator, sessionVersion});
-            };
-            window.restoreFormFields = function() {
+            }
+            function restoreFormFields() {
                   console.log("Restoring form fields...");
-            };
+            }
     </script>
 
-    <!-- 2. تحميل سكربت ماستركارد (الإنتاج) مع ربط الدوال -->
+    <!-- تحميل سكربت ماستركارد الرسمي للإنتاج -->
     <script 
         src="https://ap-gateway.mastercard.com/static/checkout/checkout.min.js"
         data-error="errorCallback"
