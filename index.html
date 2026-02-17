@@ -15,19 +15,19 @@
     <!-- تعريف الدوال المرجعية للدفع بشكل عالمي (Global) -->
     <script type="text/javascript">
             function errorCallback(error) {
-                  console.log("Payment Error:", JSON.stringify(error));
+                  console.error("Mastercard Gateway Error:", error);
                   if(window.reactPaymentHandler) window.reactPaymentHandler('error', error);
             }
             function cancelCallback() {
-                  console.log("Payment Cancelled");
+                  console.log("Payment Cancelled by user");
                   if(window.reactPaymentHandler) window.reactPaymentHandler('cancel');
             }
             function completeCallback(resultIndicator, sessionVersion) {
-                  console.log("Payment Complete:", resultIndicator);
+                  console.log("Payment Success! Indicator:", resultIndicator);
                   if(window.reactPaymentHandler) window.reactPaymentHandler('complete', {resultIndicator, sessionVersion});
             }
             function restoreFormFields() {
-                  console.log("Restoring form fields...");
+                  console.log("Restoring card fields if needed...");
             }
     </script>
 
@@ -66,7 +66,9 @@
       body { margin: 0; padding: 0; }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+      .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
     </style>
 
 <script type="importmap">
