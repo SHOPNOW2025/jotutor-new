@@ -181,7 +181,6 @@ export interface HomepageContent {
   statsStudentLabel?: string;
   statsSatisfactionRate?: string;
   statsSatisfactionLabel?: string;
-  // English Stats
   statsTeacherCount_en?: string;
   statsTeacherLabel_en?: string;
   statsAcceptanceRate_en?: string;

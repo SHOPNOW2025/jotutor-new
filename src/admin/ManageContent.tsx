@@ -40,14 +40,6 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
     }));
   };
 
-  const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocalContent(prev => ({
-        ...prev,
-        contact: { ...prev.contact, [name]: value }
-    }));
-  };
-
   const handleAboutChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (name === 'whyJoTutor') {
@@ -90,37 +82,27 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
     switch(activeTab) {
         case 'homepage':
             return (
-                <div className="space-y-10 animate-fade-in">
-                    <div className="p-6 border-2 border-green-100 rounded-3xl bg-green-50/30">
-                        <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-6 bg-green-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Homepage Statistics' : 'إحصائيات الصفحة الرئيسية'}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="space-y-6">
+                    <div className="p-4 border rounded-xl bg-green-50/20">
+                        <h3 className="font-black mb-4 text-blue-900">إحصائيات الصفحة الرئيسية</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {[
                                 { id: 'Teacher', type: 'Count' },
                                 { id: 'Acceptance', type: 'Rate' },
                                 { id: 'Student', type: 'Count' },
                                 { id: 'Satisfaction', type: 'Rate' }
                             ].map((stat, i) => (
-                                <div key={i} className="space-y-3 bg-white p-4 rounded-2xl shadow-sm border border-green-50">
+                                <div key={i} className="bg-white p-3 rounded-lg border">
                                     <label className="block text-[9px] font-black text-gray-400 uppercase">{stat.id}</label>
-                                    <input name={`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-sm font-bold text-green-600" />
-                                    <input name={`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded-lg text-xs" />
+                                    <input name={`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}${stat.type}${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded mb-2 text-sm" />
+                                    <input name={`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}` as any} value={(localContent.homepage as any)[`stats${stat.id}Label${isEnglishAdmin ? '_en' : ''}`] || ''} onChange={handleHomepageChange} className="w-full p-2 border rounded text-xs" />
                                 </div>
                             ))}
                         </div>
                     </div>
-
-                    <div className="p-6 border-2 border-blue-100 rounded-3xl bg-blue-50/30">
-                        <h3 className="font-black mb-6 text-blue-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
-                            {isEnglishAdmin ? 'Features Section' : 'قسم الميزات'}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input name="featuresTitle" value={localContent.homepage.featuresTitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl font-bold" />
-                            <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle || ''} onChange={handleHomepageChange} className="w-full p-3 border rounded-xl text-sm" rows={1}></textarea>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input name="featuresTitle" value={localContent.homepage.featuresTitle || ''} onChange={handleHomepageChange} placeholder="عنوان الميزات" className="w-full p-3 border rounded-xl font-bold" />
+                        <textarea name="featuresSubtitle" value={localContent.homepage.featuresSubtitle || ''} onChange={handleHomepageChange} placeholder="وصف الميزات" className="w-full p-3 border rounded-xl text-sm" rows={1}></textarea>
                     </div>
                 </div>
             );
@@ -162,15 +144,11 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                     </div>
                 </div>
             );
-        case 'footer':
+        case 'about':
             return (
-                <div className="space-y-8 animate-fade-in">
-                    <div className="p-6 border rounded-[2rem] bg-gray-50 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" dir="rtl" rows={4} placeholder="وصف الفوتر بالعربي"></textarea>
-                            <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="w-full p-3 border rounded-xl text-sm" rows={4} placeholder="Footer description in English"></textarea>
-                        </div>
-                    </div>
+                <div className="space-y-4">
+                    <input name="aboutTitle" value={localContent.about.aboutTitle} onChange={handleAboutChange} className="w-full p-2 border rounded" placeholder="عنوان الصفحة"/>
+                    <textarea name="vision" value={localContent.about.vision} onChange={handleAboutChange} className="w-full p-2 border rounded" rows={3} placeholder="الرؤية"></textarea>
                 </div>
             );
         case 'faq':
@@ -182,10 +160,55 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                             <textarea value={isEnglishAdmin ? (item.answer_en || '') : item.answer} onChange={e => handleFaqChange(item.id, isEnglishAdmin ? 'answer_en' : 'answer', e.target.value)} className="w-full p-2 border rounded"></textarea>
                         </div>
                     ))}
-                    <button onClick={addFaqItem} className="bg-blue-500 text-white px-4 py-2 rounded">Add FAQ</button>
+                    <button onClick={addFaqItem} className="bg-blue-500 text-white px-4 py-2 rounded">إضافة سؤال</button>
                 </div>
             );
-        case 'contact':
+        case 'footer':
             return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input name="email" value={localContent.contact.email} onChange={handleContactChange} className="p-
+                    <textarea name="description" value={localContent.footer?.description || ''} onChange={handleFooterChange} className="p-2 border rounded" rows={4} placeholder="وصف الفوتر (عربي)"></textarea>
+                    <textarea name="description_en" value={localContent.footer?.description_en || ''} onChange={handleFooterChange} className="p-2 border rounded" rows={4} placeholder="Footer Desc (EN)"></textarea>
+                </div>
+            );
+        case 'privacy':
+        case 'terms':
+        case 'paymentRefund':
+            const f = activeTab === 'privacy' ? 'privacy' : activeTab === 'terms' ? 'terms' : 'paymentRefundPolicy';
+            return <textarea value={(localContent as any)[f]} onChange={e => handleTextChange(e, f)} rows={15} className="w-full p-2 border rounded"></textarea>;
+        default: return null;
+    }
+  };
+
+  const tabs: { id: ContentTab, label: string }[] = [
+      { id: 'homepage', label: isEnglishAdmin ? 'Homepage' : 'الرئيسية' },
+      { id: 'settings', label: isEnglishAdmin ? 'Bank Settings' : 'إعدادات البنك' },
+      { id: 'footer', label: isEnglishAdmin ? 'Footer' : 'الفوتر' },
+      { id: 'about', label: isEnglishAdmin ? 'About' : 'عن المنصة' },
+      { id: 'faq', label: isEnglishAdmin ? 'FAQ' : 'الأسئلة' },
+      { id: 'privacy', label: isEnglishAdmin ? 'Privacy' : 'الخصوصية' },
+  ];
+
+  return (
+    <div className="animate-fade-in pb-20">
+      <h1 className="text-3xl font-black text-blue-900 mb-6">{isEnglishAdmin ? 'English Content' : 'إدارة المحتوى'}</h1>
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-100">
+        <nav className="flex gap-2 overflow-x-auto border-b pb-4 mb-8 no-scrollbar">
+            {tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} className={`px-6 py-3 rounded-2xl font-black text-xs transition-all whitespace-nowrap ${activeTab === t.id ? 'bg-blue-900 text-white shadow-xl' : 'text-gray-400 hover:bg-gray-50'}`}>
+                    {t.label.toUpperCase()}
+                </button>
+            ))}
+        </nav>
+        <div className="min-h-[500px]">{renderTabContent()}</div>
+        <div className="mt-12 pt-8 border-t bg-gray-50 -mx-8 -mb-8 p-8 rounded-b-[2.5rem]">
+            <button onClick={handleSaveChanges} className="bg-blue-900 text-white font-black py-4 px-16 rounded-2xl shadow-xl hover:bg-blue-800 transition-all">
+                {isEnglishAdmin ? 'Save Changes' : 'حفظ التغييرات'}
+            </button>
+        </div>
+        {status && <div className="fixed bottom-10 right-10 bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-black z-[100] animate-bounce">{status.message}</div>}
+      </div>
+    </div>
+  );
+};
+
+export default ManageContent;
