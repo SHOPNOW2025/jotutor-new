@@ -19,30 +19,98 @@ declare global {
     }
 }
 
-const PaymentPage: React.FC<PaymentPageProps> = ({ course, siteContent, currency, strings, onEnroll }) => {
+const PaymentPage: React.FC<PaymentPageProps> = ({ course, onEnroll }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [showCardForm, setShowCardForm] = useState(false);
     const [gatewayError, setGatewayError] = useState<string | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<'visa' | 'cliq'>('visa');
     
-    const MERCHANT_ID = "9547143225EP";
+    const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+    const [successIndicator, setSuccessIndicator] = useState<string | null>(null);
+    const [paymentReceipt, setPaymentReceipt] = useState<any>(null);
+    const [checkoutReady, setCheckoutReady] = useState(false);
+    const [sessionData, setSessionData] = useState<{sessionId: string, merchantId: string} | null>(null);
+    
     const embedRef = useRef<HTMLDivElement>(null);
 
+    // Handle checkout initialization when state is ready
     useEffect(() => {
-        window.reactPaymentHandler = (status, data) => {
+        if (showCardForm && sessionData && checkoutReady && !isLoading && !gatewayError) {
+            const timer = setTimeout(() => {
+                if (window.Checkout && sessionData) {
+                    console.log("Initializing Mastercard Checkout with Session:", sessionData.sessionId);
+                    try {
+                        console.log("Current Origin (Must be whitelisted in Mastercard Portal):", window.location.origin);
+                        
+                        // Re-add order details since they are no longer in the server-side session creation
+                        window.Checkout.configure({
+                            session: { id: sessionData.sessionId },
+                            order: {
+                                amount: (course.priceJod || course.price || 0).toFixed(2),
+                                currency: 'JOD',
+                                description: course.title,
+                                id: currentOrderId
+                            }
+                        });
+                        
+                        console.log("Calling showEmbeddedPage...");
+                        const target = document.querySelector('#embed-target');
+                        if (target) {
+                            if (typeof window.Checkout.showEmbeddedPage === 'function') {
+                                window.Checkout.showEmbeddedPage('#embed-target');
+                            } else {
+                                console.warn("showEmbeddedPage not found, falling back to showPaymentPage");
+                                window.Checkout.showPaymentPage();
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Checkout Configuration Error:", e);
+                        setGatewayError("حدث خطأ أثناء تهيئة بوابة الدفع.");
+                    }
+                } else {
+                    console.warn("Mastercard Checkout or Session Data missing when trying to configure.");
+                }
+            }, 50); // Minimal delay for DOM paint
+            return () => clearTimeout(timer);
+        }
+    }, [showCardForm, sessionData, checkoutReady, isLoading, gatewayError]);
+
+    useEffect(() => {
+        window.reactPaymentHandler = async (status, data) => {
             console.log("Gateway Response:", status, data);
-            setIsLoading(false);
             
             if (status === 'complete') {
-                onEnroll(course, 'Success', {
-                    paymentMethod: 'Credit Card',
-                    transactionId: data?.resultIndicator,
-                    orderId: data?.orderId
-                });
+                setIsLoading(true);
+                try {
+                    // Step 5: Verify the payment on our server using resultIndicator AND successIndicator
+                    const verifyResponse = await fetch(`/api/payment/verify?orderId=${currentOrderId}&resultIndicator=${data?.resultIndicator}&successIndicator=${successIndicator}`);
+                    const verifyData = await verifyResponse.json();
+
+                    if (verifyData.success) {
+                        setPaymentReceipt(verifyData);
+                        onEnroll(course, 'Success', {
+                            paymentMethod: 'Credit Card',
+                            transactionId: verifyData.transactionId || data?.resultIndicator,
+                            orderId: currentOrderId,
+                            amount: verifyData.amount,
+                            currency: verifyData.currency
+                        });
+                    } else {
+                        setGatewayError(verifyData.error || "فشل التحقق من الدفع. يرجى التواصل مع الدعم الفني.");
+                    }
+                } catch (err) {
+                    setGatewayError("حدث خطأ أثناء التحقق من الدفع.");
+                } finally {
+                    setIsLoading(false);
+                }
             } else if (status === 'error') {
+                setIsLoading(false);
                 setGatewayError("فشلت عملية الدفع البنكية. يرجى التحقق من الرصيد أو بيانات البطاقة.");
             } else if (status === 'cancel') {
+                setIsLoading(false);
                 setShowCardForm(false);
+                setCheckoutReady(false);
+                setSessionData(null);
             }
         };
 
@@ -50,7 +118,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, siteContent, currency
             // @ts-ignore
             window.reactPaymentHandler = null; 
         };
-    }, [course, onEnroll]);
+    }, [course, onEnroll, currentOrderId, successIndicator]);
 
     const handleConfirmPayment = () => {
         if (paymentMethod === 'visa') {
@@ -63,7 +131,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, siteContent, currency
     const initiateRealPayment = async () => {
         setIsLoading(true);
         setGatewayError(null);
-        setShowCardForm(true);
+        setCheckoutReady(false);
 
         if (!window.Checkout) {
             setGatewayError("فشل تحميل مكتبة البنك. يرجى تحديث الصفحة.");
@@ -72,46 +140,75 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, siteContent, currency
         }
 
         try {
-            // سحب الجلسة من الأدمن (Firestore)
-            const sessionId = siteContent.mastercardSessionId;
+            const orderId = `JOT-${Date.now().toString().slice(-8)}`;
+            setCurrentOrderId(orderId);
 
-            if (!sessionId) {
-                setGatewayError("بوابة الدفع غير مهيأة حالياً. يرجى التواصل مع الإدارة.");
-                setIsLoading(false);
-                return;
-            }
-
-            window.Checkout.configure({
-                merchant: MERCHANT_ID,
-                order: {
-                    amount: () => course.priceJod || course.price || 0,
+            // Step 1: Fetch a fresh session ID and successIndicator from our backend
+            const sessionResponse = await fetch('/api/payment/session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: course.priceJod || course.price || 0,
                     currency: 'JOD',
-                    description: course.title,
-                    id: `JOT-${Date.now().toString().slice(-8)}`
-                },
-                session: { id: sessionId },
-                interaction: {
-                    merchant: { name: 'JoTutor Platform' },
-                    displayControl: { billingAddress: 'HIDE', customerEmail: 'HIDE' }
-                }
+                    orderId: orderId
+                })
             });
-
-            window.Checkout.showEmbeddedPage('#embed-target');
             
-            setTimeout(() => {
-                if (embedRef.current && embedRef.current.innerHTML.trim().length < 10) {
-                    setGatewayError("جلسة الدفع الحالية منتهية (Expired Session). يرجى العودة والمحاولة مرة أخرى بعد أن يقوم المسؤول بتحديث الجلسة.");
-                    setIsLoading(false);
-                } else {
-                    setIsLoading(false);
-                }
-            }, 4000);
-
+            if (!sessionResponse.ok) {
+                const errorData = await sessionResponse.json();
+                const details = errorData.details ? `: ${JSON.stringify(errorData.details)}` : "";
+                throw new Error(`${errorData.error}${details}`);
+            }
+            
+            const { sessionId, merchantId, successIndicator: indicator } = await sessionResponse.json();
+            setSuccessIndicator(indicator);
+            setSessionData({ sessionId, merchantId });
+            
+            // Now show the form container
+            setShowCardForm(true);
+            setCheckoutReady(true);
+            setIsLoading(false);
         } catch (err) {
-            setGatewayError("حدث خطأ في الاتصال بخوادم Mastercard.");
+            setGatewayError("حدث خطأ في الاتصال بخوادم Mastercard." + err);
             setIsLoading(false);
         }
     };
+
+    if (paymentReceipt) {
+        return (
+            <div className="py-12 bg-gray-50 min-h-screen flex items-center justify-center animate-fade-in">
+                <div className="bg-white p-12 rounded-[3rem] shadow-2xl border border-gray-100 max-w-md w-full text-center">
+                    <div className="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 text-4xl shadow-inner">
+                        ✓
+                    </div>
+                    <h1 className="text-3xl font-black text-blue-900 mb-4 tracking-tighter uppercase">تم الدفع بنجاح</h1>
+                    <p className="text-gray-500 font-bold mb-8">لقد تم تفعيل اشتراكك في الدورة بنجاح. يمكنك الآن البدء بالتعلم.</p>
+                    
+                    <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 text-right space-y-3 mb-8">
+                        <div className="flex justify-between text-xs font-black text-gray-400 uppercase">
+                            <span>{paymentReceipt.transactionId}</span>
+                            <span>رقم العملية</span>
+                        </div>
+                        <div className="flex justify-between text-xs font-black text-gray-400 uppercase">
+                            <span>{currentOrderId}</span>
+                            <span>رقم الطلب</span>
+                        </div>
+                        <div className="border-t pt-3 flex justify-between text-blue-900 font-black">
+                            <span>{paymentReceipt.amount} {paymentReceipt.currency}</span>
+                            <span>المبلغ المدفوع</span>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={() => window.location.href = '/dashboard'}
+                        className="w-full py-5 rounded-2xl font-black text-white bg-blue-900 hover:bg-blue-800 shadow-xl transition-all"
+                    >
+                        الانتقال للوحة التحكم
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="py-12 bg-gray-50 min-h-screen animate-fade-in">
@@ -194,6 +291,23 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, siteContent, currency
                                     </div>
                                     <div className="relative flex-1 min-h-[350px] border-2 border-gray-100 rounded-[2.5rem] bg-gray-50/50 p-1 flex flex-col overflow-hidden shadow-inner">
                                         <div id="embed-target" ref={embedRef} className="w-full h-full min-h-[350px]"></div>
+                                        
+                                        {/* Manual trigger buttons as per user request */}
+                                        <div className="absolute bottom-4 left-4 right-4 flex gap-2 z-10">
+                                            <button 
+                                                onClick={() => window.Checkout.showEmbeddedPage('#embed-target')}
+                                                className="flex-1 py-2 bg-blue-900 text-white text-[10px] font-black rounded-lg shadow-lg hover:bg-blue-800 transition-all uppercase tracking-tighter"
+                                            >
+                                                Pay with Embedded Page
+                                            </button>
+                                            <button 
+                                                onClick={() => window.Checkout.showPaymentPage()}
+                                                className="flex-1 py-2 bg-gray-800 text-white text-[10px] font-black rounded-lg shadow-lg hover:bg-gray-700 transition-all uppercase tracking-tighter"
+                                            >
+                                                Pay with Payment Page
+                                            </button>
+                                        </div>
+
                                         {isLoading && (
                                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-20">
                                                 <div className="w-16 h-16 border-4 border-blue-900 border-t-transparent rounded-full animate-spin mb-4"></div>

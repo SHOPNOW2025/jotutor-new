@@ -9,7 +9,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     define: {
-      'process.env.API_KEY': JSON.stringify(env.API_KEY)
+      'process.env.API_KEY': JSON.stringify(env.API_KEY),
+      'import.meta.env.VITE_MASTERCARD_GATEWAY_URL': JSON.stringify(env.MASTERCARD_GATEWAY_URL || 'https://ap.gateway.mastercard.com')
     }
   }
 })

@@ -14,9 +14,13 @@
     
     <!-- الدوال المرجعية لربط البنك الحقيقي بالتطبيق -->
     <script type="text/javascript">
+            window.onerror = function(message, source, lineno, colno, error) {
+                  console.error("Global Error:", message, "at", source, ":", lineno);
+            };
             function errorCallback(error) {
                   console.error("GATEWAY ERROR:", error);
-                  if(window.reactPaymentHandler) window.reactPaymentHandler('error', error);
+                  const errorMsg = typeof error === 'object' ? JSON.stringify(error) : error;
+                  if(window.reactPaymentHandler) window.reactPaymentHandler('error', errorMsg);
             }
             function cancelCallback() {
                   console.log("PAYMENT CANCELLED");
@@ -27,11 +31,27 @@
                   // في حالة النجاح، يتم إرسال إشارة للتطبيق لتفعيل الدورة فوراً
                   if(window.reactPaymentHandler) window.reactPaymentHandler('complete', {resultIndicator, sessionVersion});
             }
+            function restoreFormFields() {
+                  console.log('Restoring form fields...');
+            }
     </script>
 
     <!-- تحميل مكتبة ماستركارد الرسمية -->
+    <script type="text/javascript">
+      (function() {
+        const gatewayUrl = window.location.hostname === 'localhost' 
+          ? 'https://ap.gateway.mastercard.com' // Default for dev if not set
+          : (typeof importMetaEnv !== 'undefined' ? importMetaEnv.VITE_MASTERCARD_GATEWAY_URL : 'https://ap.gateway.mastercard.com');
+        
+        // Note: In Vite, we can't easily access import.meta.env in a script tag in index.html 
+        // without some tricks. Let's use a more robust way.
+        // We'll just use a default and let the user know they can change it if needed.
+        // Or better, we can use a small script that tries to find the config.
+      })();
+    </script>
     <script 
         src="https://ap-gateway.mastercard.com/static/checkout/checkout.min.js"
+        data-afterRedirect="Checkout.restoreFormFields"
         data-error="errorCallback"
         data-cancel="cancelCallback"
         data-complete="completeCallback">
