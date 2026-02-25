@@ -13,12 +13,13 @@ async function startServer() {
   app.post("/api/payment/session", async (req, res) => {
     const { amount, currency, orderId } = req.body;
     const GATEWAY_URL = process.env.MASTERCARD_GATEWAY_URL || "https://ap-gateway.mastercard.com";
-    const MERCHANT_ID = (process.env.MASTERCARD_MERCHANT_ID || "9547143225EP").trim();
+    const MERCHANT_ID = (process.env.MASTERCARD_MERCHANT_ID || "").trim();
     const API_PASSWORD = (process.env.MASTERCARD_API_PASSWORD || "").trim();
 
-    if (!API_PASSWORD) {
+    if (!MERCHANT_ID || !API_PASSWORD) {
       return res.status(500).json({ 
-        error: "Mastercard API Password is not configured in environment variables." 
+        error: "Mastercard configuration missing",
+        message: "Please ensure MASTERCARD_MERCHANT_ID and MASTERCARD_API_PASSWORD are set."
       });
     }
 

@@ -126,7 +126,7 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                                     value={localContent.mastercardSessionId || ''} 
                                     onChange={handleSettingsChange} 
                                     className="w-full p-5 bg-white border-2 border-blue-100 rounded-2xl outline-none focus:border-blue-600 font-mono text-blue-600 font-bold shadow-inner" 
-                                    placeholder="SESSION0002XXXXXXXXXXXXXX" 
+                                    placeholder="Enter Session ID" 
                                 />
                                 <p className="mt-3 text-[10px] text-gray-400 font-bold leading-relaxed bg-white/50 p-3 rounded-lg border">
                                     ملاحظة: هذا المعرف يتم استخراجه من لوحة تحكم التاجر. إذا انتهت صلاحيته، ستظهر للطلاب رسالة "Session Expired". قم بتوليد معرف جديد وضعه هنا ليعمل الدفع فوراً.
@@ -136,11 +136,8 @@ const ManageContent: React.FC<ManageContentProps> = ({ content, onUpdate, isEngl
                     </div>
 
                     <div className="p-8 border rounded-[2.5rem] bg-gray-50/50">
-                        <h3 className="text-lg font-black text-blue-900 mb-4 uppercase">مفاتيح API أخرى</h3>
-                        <div>
-                            <label className="block text-[10px] font-black text-gray-400 mb-2 uppercase">Google Gemini API Key</label>
-                            <input name="geminiApiKey" value={localContent.geminiApiKey || ''} onChange={handleSettingsChange} className="w-full p-3 border rounded-xl font-mono text-xs" type="password" />
-                        </div>
+                        <h3 className="text-lg font-black text-blue-900 mb-4 uppercase">إعدادات النظام</h3>
+                        <p className="text-xs text-gray-500 font-bold">تم نقل إعدادات المفاتيح الحساسة إلى متغيرات البيئة (Environment Variables) لزيادة الأمان.</p>
                     </div>
                 </div>
             );

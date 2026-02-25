@@ -22,7 +22,11 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({ value, onChange, pl
 
         try {
             // Using the provided ImgBB API Key
-            const response = await fetch('https://api.imgbb.com/1/upload?key=8651c8d21d91d90c780590fa34ee35aa', {
+            const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+            if (!apiKey) {
+                throw new Error('ImgBB API key is missing');
+            }
+            const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
                 method: 'POST',
                 body: formData,
             });

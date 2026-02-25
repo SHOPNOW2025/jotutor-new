@@ -5,18 +5,18 @@ import "firebase/compat/analytics";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 
-import { SiteContent, OnboardingOptions, Course, Payment } from './types';
+import { SiteContent, OnboardingOptions, Course } from './types';
 import { initialData } from './mockData';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD22o_UCJ7xrbawNuIlACvFtbQB9HeUn9g",
-  authDomain: "jototur-2f755.firebaseapp.com",
-  projectId: "jototur-2f755",
-  storageBucket: "jototur-2f755.appspot.com",
-  messagingSenderId: "122916103662",
-  appId: "1:122916103662:web:bd7ef6e0c6d7be0a2bdaff",
-  measurementId: "G-YSH7WBLZYB"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase safely
