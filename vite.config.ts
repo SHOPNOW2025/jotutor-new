@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react()],
+    server: {
+      allowedHosts: true
+    },
     define: {
       'process.env.API_KEY': JSON.stringify(env.API_KEY),
       'import.meta.env.VITE_MASTERCARD_GATEWAY_URL': JSON.stringify(env.MASTERCARD_GATEWAY_URL || 'https://ap.gateway.mastercard.com')

@@ -1,0 +1,2124 @@
+<?xml version='1.0'?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<!-- Resource Properties: comment=Updated US English for the 26.1.0.1 release. Updated API integration guide and version.; locale=en_US; version=26.1.0.1;  -->
+<head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
+  <title>Integration Guide</title>
+  <link rel="stylesheet" type="text/css" href="/api/apiDoc/apiReference.css"/>
+  <link rel="stylesheet" type="text/css" href="/api/apiDoc/api.css"/>
+  <link rel="stylesheet" type="text/css" href="/api/style/page.css"/>
+  <link rel="stylesheet" type="text/css" href="/api/style/prettify.css"/>
+  <link rel="stylesheet" type="text/css" href="/api/style/thickbox.css"/>
+  <link rel="stylesheet" type="text/css" href="/api/style/font-awesome/css/font-awesome.min.css"/>
+  <link rel="icon" type="image/x-icon" href="resource/favicon.ico"/>
+  <script type="text/javascript" src="/api/scripts/prettify.js" integrity="sha512-x5PVnj0Iy8gErwbgzjqTuUCaEuiAWdEnGW//fZE57TWCzVHGUgcK7vAYS2CiFBStMOqadivjmgs1aK2neqyhqg==" crossorigin="anonymous"/>
+    <script type="text/javascript" src="/api/scripts/jquery-3.4.1.min.js" integrity="sha512-wSJHkesPV90zSc/+h3vzdfUN1uNyrY5G1uFhiksZ8sC/OsWPxGpiAqEglCCXujv4eQfLjsSANbc2Zi+TsmEIlw==" crossorigin="anonymous"/>
+    <script type="text/javascript" src="/api/scripts/thickbox.js" integrity="sha512-bkPgl3o4P/5kamx5xR27629jcZGJlBXHyp7aK1vkJFooiMQR0NRDRdctgfFDYPr0X1uz3KFj8UcRtHYkGaT34w==" crossorigin="anonymous"/>
+    <script type="text/javascript" src="/api/scripts/assets.js" integrity="sha512-wPAB1kLmA2PJYP2XRnatzbSTO3wTk16c6l+2HIxY2LcchaEikxL05vVK++Yv5Vq8vdY94/5jsDbzLamatruVag==" crossorigin="anonymous"/>
+  <!--[if lte IE 7]><!-->
+<style type="text/css">
+    <!--/*--><![CDATA[/*><!--*/
+    h2 a, .demo {position:relative; height:1%}
+    /*]]>*/-->
+</style>
+<!--<![endif]-->
+
+<!--[if lte IE 6]><!-->
+<script type="text/javascript">
+    <!--//--><![CDATA[//><!--
+    try { document.execCommand( "BackgroundImageCache", false, true); } catch(e) {}
+    //--><!]]>
+</script>
+<!--<![endif]-->
+
+<!--[if !lt IE 6]><!-->
+<script type="text/javascript" src="/api/scripts/expand.js" integrity="sha512-IMdSoLOMRJ2pmHaZckLujiCMCZvrQMLMH5RhJQaUf8sBM5Z0ryx3xGpRqFrtL/XXyLm+CLjxGGpaPk10BK1K9w==" crossorigin="anonymous"/>
+<script type="text/javascript" src="/api/scripts/utils.js" integrity="sha512-ZPW+LTXJaB0Qoy2WCwEnwAMGPspo4T+/7/419E45fZTJr9B2/R+uzg4FqRqDPudBP/SEmByXrE8Hr+9ILbfFaw==" crossorigin="anonymous"/>
+<script type="text/javascript">
+  </script>
+<!--<![endif]--><link rel="stylesheet" href="/api/documentation/resource/brand.css" type="text/css"/>
+</head>
+<body id="igLanding" onload="prettyPrint()">
+    <div id="ContainerOuterBorder" class="">
+        <div id="ContainerMain">
+            <div id="ContainerHeader">
+    <div id="Header1">
+    </div>
+    <div id="Header2">
+    </div>
+    <div id="Header3">
+    </div>
+    <ul id="nav-horiz-header" class="">
+        <li><a class="spanwrap" href="/api/documentation/integrationGuidelines/index.html?locale=en_US" id="tab1"><span>Documentation</span></a></li>
+        <li><a class="spanwrap" href="/api/documentation/apiDocumentation/rest-json/version/latest/apiReference.html?locale=en_US" id="tab2"><span title="" class="apiTabDefault">API Reference</span></a></li>
+        <li><div id="localeSelectorInHeader">
+        <form id="formLocaleSelector" method="get" action="">
+            <select id="localeSelect" name="locale" role="menu" autocomplete="language" onchange="this.form.submit()">
+            <option role="menuitem" value="el_GR">Ελληνικά (Ελλάδα)</option>
+            <option role="menuitem" value="en_US" selected="selected">English (United States)</option>
+            <option role="menuitem" value="es_MX">español (México)</option>
+            <option role="menuitem" value="fr_FR">français (France)</option>
+            <option role="menuitem" value="ro_RO">română (România)</option>
+            <option role="menuitem" value="zh_CN">中文 (中国)</option>
+            </select>
+            <noscript><input type="submit" id="buttonLocaleSelector" value=""/>"
+            </noscript>
+        </form>
+    </div>
+</li>
+    </ul>
+
+    <script>
+        let position = document.location.toString().search(/\/mso\//);
+        if (position != -1) {
+            let localeDiv = document.getElementById('localeSelectorInHeader');
+            localeDiv.style.display = 'none';
+        }
+
+        /* Both the anchor links have brand color, so the link which is currently not selected is converted to black color */
+        if(document.baseURI.toString().includes('apiDocumentation')){      //When 'API Reference' is selected
+            deActivateTab('tab1');
+        }
+        else{      //When 'Documentation' or any link in Resources like Glossary/FAQ/Downloads is selected
+            deActivateTab('tab2');
+        }
+
+        function deActivateTab(tabId){
+            let element = document.getElementById(tabId);
+            element.style.borderBottom = 'none';
+            element.style.color = '#111111';
+            element.style.fontWeight = '500';
+        }
+
+    </script>
+</div>
+<div id="navcontainer">
+  <nav id="navigation">
+        <script type="text/javascript" src="/api/scripts/navigation.js" integrity="" crossorigin="anonymous"/>
+<form id="searchbar" class="menu">
+    <input id="searchbar_input" autocomplete="off" type="text" placeholder="" onkeypress="return event.keyCode != 13;" role="searchbox" aria-label="search"/>
+    <button id="searchbar_reset" type="reset">✕
+    </button>
+    <p id="searchbar_resultsheading" style="display: none;">
+        Search results</p>
+    <p id="searchbar_resultsnotfound" style="display: none;">
+        No pages found</p>
+    <ul id="searchbar_results"/>
+</form>
+<a id="anchor-back" href="/api/documentation/integrationGuidelines/index.html?locale=en_US">
+    <span>Back</span>
+</a>
+<ul id="navroot" class="menu">
+    <li>
+        <a class="no_h2_header" href="/api/documentation/integrationGuidelines/index.html?locale=en_US">
+            Overview</a>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/gettingStarted/gettingStarted.html?locale=en_US">
+            Getting Started</a>
+        <ul class="subMenu">
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/gettingStarted/orderAndTransactionConcepts.html?locale=en_US">
+                        Order and Transaction Concepts</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/gettingStarted/paymentActorsAndFlow.html?locale=en_US">
+                            Payment Actors and Flow</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/gettingStarted/orders.html?locale=en_US">
+                            Orders</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/gettingStarted/transactions.html?locale=en_US">
+                            Transactions</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/gettingStarted/authorize.html?locale=en_US">
+                            Authorize</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/gettingStarted/identifiers.html?locale=en_US">
+                            Identifiers</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/gettingStarted/choosingIntegrationMethod.html?locale=en_US">
+                    Choosing an Integration Method</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiReference.html?locale=en_US">
+                    API Reference</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/gettingStarted/obtainTestAccount.html?locale=en_US">
+                    Accessing the API</a>
+            </li>
+        </ul>
+    </li>
+    <li class="sidebar-label">
+        Integration Types</li>
+    <li class=" filter_hostedCheckout">
+        <a href="/api/documentation/integrationGuidelines/hostedCheckout/integrationModelHostedCheckout.html?locale=en_US">
+            Hosted Checkout</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/integrationSteps.html?locale=en_US">
+                    Integration Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/establishingAsession.html?locale=en_US">
+                    Establishing a Session</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/implementingTheHostedPaymentPage.html?locale=en_US">
+                    Implementing the Hosted Payment Page</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/subsequentOperations.html?locale=en_US">
+                    Subsequent Operations</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/interpretingTheResponse.html?locale=en_US">
+                    Interpreting the Response</a>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/hostedCheckout/customizingCheckout.html?locale=en_US">
+                        Customizing the Checkout</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/customizingPaymentExperience.html?locale=en_US">
+                            Customizing the Payment Experience</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/customizeUIAccessibility.html?locale=en_US">
+                            Improving Accessibility</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/customizeRedirectAndRetryBehavior.html?locale=en_US">
+                            Customize Redirect and Retry Behavior</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/integrateApplePayHostedCheckout.html?locale=en_US">
+                            Integrate Apple Pay in Hosted Checkout</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/integrateGooglePayHostedCheckout.html?locale=en_US">
+                            Integrate Google Pay in Hosted Checkout</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/hostedCheckout/features.html?locale=en_US">
+                        Features</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/paymentEnhancements.html?locale=en_US">
+                            Payment Enhancements</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentLinks.html?locale=en_US">
+                            Payment Links</a>
+                    </li>
+                    <li class=" filter_paymentPlans">
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/paymentPlans.html?locale=en_US">
+                            Payment Plans</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedCheckout/nonEcommerceIntegrations.html?locale=en_US">
+                            Non-eCommerce Integrations</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/supportedBrowsers.html?locale=en_US">
+                    Supported Browsers and Platforms</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/testingSteps.html?locale=en_US">
+                    Testing Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedCheckout/goLiveChecklist.html?locale=en_US">
+                    Go-Live Checklist</a>
+            </li>
+        </ul>
+    </li>
+    <li class=" filter_hostedSession">
+        <a href="/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html?locale=en_US">
+            Hosted Session</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/integrationSteps.html?locale=en_US">
+                    Integration Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/paymentSessions.html?locale=en_US">
+                    Payment Sessions</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/makingAPayment.html?locale=en_US">
+                    Making a Payment</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/interpretTheTransactionResponse.html?locale=en_US">
+                    Interpret the Transaction Response</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/customizeHostedFields.html?locale=en_US">
+                    Customizing the Hosted Fields</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/subsequentOperations.html?locale=en_US">
+                    Subsequent Operations</a>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/hostedSession/features.html?locale=en_US">
+                        Features</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedSession/paymentEnhancements.html?locale=en_US">
+                            Payment Enhancements</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedSession/acceptingMultipleCards.html?locale=en_US">
+                            Accepting Multiple Cards</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/testingSteps.html?locale=en_US">
+                    Testing Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/hostedSession/goLiveChecklist.html?locale=en_US">
+                    Go-Live Checklist</a>
+            </li>
+        </ul>
+    </li>
+    <li class=" filter_directPayment">
+        <a href="/api/documentation/integrationGuidelines/directPayment/integrationModelDirectPayment.html?locale=en_US">
+            Direct Payment</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/integrationStepsDirectPayment.html?locale=en_US">
+                    Direct Payment Integration Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/definingPaymentAndPayerData.html?locale=en_US">
+                    Payment and Payer Data</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/sendTransactionRequest.html?locale=en_US">
+                    Send a Request</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/receiveTransactionResponse.html?locale=en_US">
+                    Interpret the Transaction Response</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickTransactionCommands.html?locale=en_US">
+                    Transaction Operations</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/subsequentOperations.html?locale=en_US">
+                    Subsequent Operations</a>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/directPayment/directPaymentFeatures.html?locale=en_US">
+                        Direct Payment features</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/directPayment/paymentEnhancements.html?locale=en_US">
+                            Payment Enhancements</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/directPayment/directpaymentOptionsInquiry.html?locale=en_US">
+                            Payment Options Inquiry</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/multipleSources.html?locale=en_US">
+                            Using Multiple Sources of Payment Details</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/testingSteps.html?locale=en_US">
+                    Testing Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/directPayment/goLiveChecklist.html?locale=en_US">
+                    Go-Live Checklist</a>
+            </li>
+        </ul>
+    </li>
+    <li class=" filter_batchOverview">
+        <a href="/api/documentation/integrationGuidelines/hostedBatch/batch.html?locale=en_US">
+            Hosted Batch</a>
+        <ul class="subMenu">
+            <li class=" filter_batch">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/hostedBatch/integrationModelHostedBatch.html?locale=en_US">
+                        Implementing a Batch Integration</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedBatch/accessPaymentGateway.html?locale=en_US">
+                            Access the Mastercard Gateway</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedBatch/knowingYourInputFields.html?locale=en_US">
+                            Knowing Your Input Fields</a>
+                    </li>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/hostedBatch/createBatchRequest.html?locale=en_US">
+                                Create Batch Request</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/hostedBatch/ensureCharacterEncoding.html?locale=en_US">
+                                    Ensure Correct Character Encoding</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedBatch/sendBatchRequest.html?locale=en_US">
+                            Send Batch Request</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedBatch/retrieveBatchStatus.html?locale=en_US">
+                            Retrieve the Batch Status</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/hostedBatch/processBatchResponse.html?locale=en_US">
+                            Process Batch Response</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li class=" filter_mobileSDK">
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/mobileintegration.html?locale=en_US">
+            Mobile Integration</a>
+        <ul class="subMenu">
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/index.html?locale=en_US">
+                        Integration Steps</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/mobileSDK/gatewayAndroidSDK.html?locale=en_US">
+                                Mastercard Gateway Android SDK</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/mobileSDK/reactNativeAndroid.html?locale=en_US">
+                                    React Native Android Integration</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/mobileSDK/flutterAndroid.html?locale=en_US">
+                                    Flutter Android Integration</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/mobileSDK/gatewayiOSSDK.html?locale=en_US">
+                                Mastercard Gateway iOS SDK</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/mobileSDK/reactNativeiOS.html?locale=en_US">
+                                    React Native iOS Integration</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/mobileSDK/flutteriOS.html?locale=en_US">
+                                    Flutter iOS Integration</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/applePayAndGooglePay.html?locale=en_US">
+                            Apple Pay and Google Pay</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/3DSmobileIntegration.html?locale=en_US">
+                            3D Secure Authentication</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/testingSteps.html?locale=en_US">
+                    Testing Steps</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/goLiveChecklist.html?locale=en_US">
+                    Go-Live Checklist</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/hostedSession/shoppingCartPlugins.html?locale=en_US">
+            Shopping Cart Plugin</a>
+    </li>
+    <li class="sidebar-label">
+        Other Features</li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/paymentsMethods.html?locale=en_US">
+            Payment Methods</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/cardPayments.html?locale=en_US">
+                    Card Payments</a>
+            </li>
+                        <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/domesticSchemes.html?locale=en_US">
+                        Domestic Schemes</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/rupayIntegration.html?locale=en_US">
+                            RuPay</a>
+                    </li>
+                    <li class=" filter_bancontact">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/Bancontact.html?locale=en_US">
+                            Bancontact</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/creditAndDebitCards.html?locale=en_US">
+                        Credit and Debit Cards</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_credit">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/creditCardFields.html?locale=en_US">
+                            Credit Card Payments</a>
+                    </li>
+                    <li class=" filter_debit">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/debitCardFields.html?locale=en_US">
+                            Debit Card Payments</a>
+                    </li>
+                </ul>
+            </li>
+            <li class=" filter_clickToPay">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/ClickToPay.html?locale=en_US">
+                        Click to Pay</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_hostedSession">
+                        <a href="/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession_clickToPay.html?locale=en_US">
+                            Click to Pay Hosted Session Integration</a>
+                    </li>
+                    <li class=" filter_hostedCheckout">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/clickToPayFlowsForHCO.html?locale=en_US">
+                            Click to Pay Flows for Hosted Checkout</a>
+                    </li>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/secureRemoteCommerce/index.html?locale=en_US">
+                                Secure Remote Commerce</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/secureRemoteCommerce/uiGuidelines.html?locale=en_US">
+                                    SRC User Interface Guidelines</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class=" filter_giftCards">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/giftCards.html?locale=en_US">
+                    Gift Cards</a>
+            </li>
+            <li class=" filter_dcc">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/dynamicCurrencyConversion.html?locale=en_US">
+                    Dynamic Currency Conversion</a>
+            </li>
+            <li class=" filter_surcharging">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/surcharging.html?locale=en_US">
+                    Surcharging</a>
+            </li>
+            <li class=" filter_paymentPlans">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/index.html?locale=en_US">
+                        Payment Plans</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_banortePaymentPlans">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/banorte.html?locale=en_US">
+                            Banorte</a>
+                    </li>
+                    <li class=" filter_cieloPaymentPlan">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/cielo.html?locale=en_US">
+                            Cielo</a>
+                    </li>
+                    <li class=" filter_customPaymentPlans">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/customPaymentPlans.html?locale=en_US">
+                            Custom Payment Plans</a>
+                    </li>
+                    <li class=" filter_nbgPaymentPlan">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/nbg.html?locale=en_US">
+                            National Bank of Greece (NBG)</a>
+                    </li>
+                    <li class=" filter_payLaterInstallmentPlan">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/paylaterInstallments.html?locale=en_US">
+                            Paylater Installments</a>
+                    </li>
+                    <li class=" filter_amexPaymentPlans">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/planAmex.html?locale=en_US">
+                            Plan Amex</a>
+                    </li>
+                    <li class=" filter_amexPaymentPlans">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/planN.html?locale=en_US">
+                            Plan N</a>
+                    </li>
+                    <li class=" filter_redecardPaymentPlan">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/redecard.html?locale=en_US">
+                            Redecard</a>
+                    </li>
+                    <li class=" filter_unicreditPaymentPlan">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentPlans/unicredit.html?locale=en_US">
+                            UniCredit</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/mobileWallets.html?locale=en_US">
+                        Mobile Wallets</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_applePay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/ApplePay.html?locale=en_US">
+                            Apple Pay</a>
+                    </li>
+                    <li class=" filter_googlePay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/GooglePay.html?locale=en_US">
+                            Google Pay</a>
+                    </li>
+                    <li class=" filter_samsungPay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/SamsungPay.html?locale=en_US">
+                            Samsung Pay</a>
+                    </li>
+                    <li class=" filter_chasePay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/devicePayments/ChasePay.html?locale=en_US">
+                            Chase Pay</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/alternativePaymentMethods.html?locale=en_US">
+                        Alternative Payment Methods</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_ach">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/achPayments.html?locale=en_US">
+                            Automated Clearing House</a>
+                    </li>
+                    <li class=" filter_alipay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/Alipay.html?locale=en_US">
+                            Alipay</a>
+                    </li>
+                    
+                    <li class=" filter_benefit">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/BENEFITGateway.html?locale=en_US">
+                            BENEFIT Gateway</a>
+                    </li>
+                    
+                    <li class=" filter_boletoBancario">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/BoletoBancario.html?locale=en_US">
+                            Boleto Bancário</a>
+                    </li>
+                    
+                    
+                    
+                    
+                    
+                    <li class=" filter_iDEAL">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/iDEAL.html?locale=en_US">
+                            iDEAL</a>
+                    </li>
+                        <li class=" filter_irisPay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/irisPay.html?locale=en_US">
+                            Iris Payments</a>
+                    </li>    
+                    
+                    <li class=" filter_klarnaFinancing">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/KlarnaFinancing.html?locale=en_US">
+                            Klarna Financing</a>
+                    </li>
+                    <li class=" filter_klarnaPayLater">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/KlarnaPayLater.html?locale=en_US">
+                            Klarna Pay Later</a>
+                    </li>
+                    <li class=" filter_klarnaPayNow">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/KlarnaPayNow.html?locale=en_US">
+                            Klarna Pay Now</a>
+                    </li>
+                    <li class=" filter_knet">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/KNETGateway.html?locale=en_US">
+                            KNET Gateway</a>
+                    </li>
+                    
+                    <li class=" filter_multibanco">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/Multibanco.html?locale=en_US">
+                            Multibanco</a>
+                    </li>
+                    <li class=" filter_OMANNETGateway">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/OMANNETGateway.html?locale=en_US">
+                            OMANNET Gateway</a>
+                    </li>
+                    
+                    
+                    
+                    <li class=" filter_oxxo">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/OXXO.html?locale=en_US">
+                            OXXO</a>
+                    </li>
+                    <li class=" filter_pbba">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/PbBA.html?locale=en_US">
+                            Pay by Bank App</a>
+                    </li>
+                    
+                    <li class=" filter_payPal">
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/PayPal.html?locale=en_US">
+                                PayPal</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/PayPal/integrationDirectJS.html?locale=en_US">
+                                    Direct Integration to PayPal JS SDK</a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    
+                    
+                    <li class=" filter_poli">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/POLi.html?locale=en_US">
+                            POLi</a>
+                    </li>
+                    
+                    <li class=" filter_QPAYGateway">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/QPAYGateway.html?locale=en_US">
+                            QPAY Gateway</a>
+                    </li>
+                    <li class=" filter_sepa">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/SEPA.html?locale=en_US">
+                            SEPA</a>
+                    </li>
+                    
+                    
+                    <li class=" filter_unionPaySecurePay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/UnionPaySecurePay.html?locale=en_US">
+                            UnionPay SecurePay</a>
+                    </li>
+                    <li class=" filter_wechatpay">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/WeChatPay.html?locale=en_US">
+                            WeChat Pay</a>
+                    </li>
+                    <li class=" filter_browserPayments">
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/index.html?locale=en_US">
+                                Implementing a Browser Payment Integration</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/testDetails.html?locale=en_US">
+                                    Testing a Browser Payment Integration</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/securityAndFraudPrevention.html?locale=en_US">
+            Security and Fraud Prevention</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickSecurityModel/secureYourIntegration.html?locale=en_US">
+                    Secure Your Integration with Passwords or Certificates</a>
+            </li>
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/authentication.html?locale=en_US">
+                        Authentication</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/3DS/3DSecureAuthentication.html?locale=en_US">
+                                3D Secure Authentication</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/3DS/3DSHostedCheckout.html?locale=en_US">
+                                    3DS with Hosted Checkout</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/3DS/integrationModelAPI.html?locale=en_US">
+                                    3DS with the Payer Authentication API</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/3DS/integrationModelJS.html?locale=en_US">
+                                    3DS with the 3DS JavaScript API</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/3DS/test_your_integration.html?locale=en_US">
+                                    Test Your Integration</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/TAS/tokenAuthenticationService.html?locale=en_US">
+                                Token Authentication Service</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/TAS/TASFlows.html?locale=en_US">
+                                    Token Authentication Service Flow</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/TAS/TAFPassthrough.html?locale=en_US">
+                                    Token Authentication Framework Passthrough Processing</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/authentication/TAS/tokenAuthenticationServiceForC2P.html?locale=en_US">
+                                    Token Authentication Service for Click to Pay</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/psd2ScaCompliance.html?locale=en_US">
+                                PSD2 SCA Compliance and Exemptions</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/psd2ScaComplianceHostedCheckout.html?locale=en_US">
+                                    Hosted Checkout Integration for PSD2 SCA</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/psd2ScaComplianceAuthenticationAPI.html?locale=en_US">
+                                    Gateway Integration for PSD2 SCA Compliance and Exemptions</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/psd2ScaCompliance3dsJS.html?locale=en_US">
+                                    3DS JavaScript API Integration for PSD2 SCA</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class=" filter_tokenization">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenization/tokenizationOverview.html?locale=en_US">
+                        Tokenization</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenization/tokenization.html?locale=en_US">
+                            Gateway Tokenization</a>
+                    </li>
+                    <li class=" filter_networkTokenization">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenization/networkTokenization.html?locale=en_US">
+                            Network Tokenization</a>
+                    </li>
+                </ul>
+            </li>
+            <li class=" filter_risk">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/risk/index.html?locale=en_US">
+                        Risk Management</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/transactionFiltering.html?locale=en_US">
+                            Transaction Filtering</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/addressVerificationService.html?locale=en_US">
+                            Address Verification Service</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/index.html?locale=en_US">
+            Features</a>
+        <ul class="subMenu">
+            <li class=" filter_reportingAPI">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/reporting/reportingAPI.html?locale=en_US">
+                    Reporting</a>
+            </li>
+            <li class=" filter_webhookNotifications">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/webhookNotifications.html?locale=en_US">
+                    Webhook Notifications</a>
+            </li>
+            <li class=" filter_funding">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/fundingAndFeeInformation.html?locale=en_US">
+                    Funding and Fee Information</a>
+            </li>
+            <li class=" filter_cardPresent">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/cardPresentData.html?locale=en_US">
+                        Cardholder Present</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    
+                    <li>
+                        <div class="toggle-panel">
+                            <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/transit.html?locale=en_US">
+                                Transit</a>
+                            <span class="collapsedView"/>
+                        </div>
+                        <ul>
+                            <li><a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/knownFare.html?locale=en_US">
+                                    Known Fare</a>
+                            <li><a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/aggregatedTransit.html?locale=en_US">
+                                        Aggregated Transit Rules</a>
+                            </li>
+                            <li><div class="toggle-panel">
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/aggregatedTransitInNam.html?locale=en_US">
+                                        Aggregated Transit Rules in the North American Region</a>
+                                <span class="collapsedView"/>
+                                </div>
+                                <ul>
+                                    <li><a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/examplesAggNamMastercardVisa.html?locale=en_US">
+                                        WS API examples of Mastercard and Visa</a>
+                                    </li>
+                                    <li><a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/examplesAggNamAmex.html?locale=en_US">
+                                        WS API examples of American Express</a>
+                                    </li>
+                                    <li><a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/examplesAggNamDiscDiners.html?locale=en_US">
+                                        WS API examples of Discover and Diners</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/firstRideRisk.html?locale=en_US">
+                                    First Ride Risk</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/referenceOrderId.html?locale=en_US">
+                                    Reference Order Id</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/updateAppTranCounter.html?locale=en_US">
+                                    Update Application Transaction Counter</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/paymentInstrumentReferenceID.html?locale=en_US">
+                                    Payment Instrument Reference ID</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/contactlessPaymentUsingMobileDevices.html?locale=en_US">
+                            Contactless Payment Using Mobile Devices</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/paymentAccountReference.html?locale=en_US">
+                            Payment Account Reference</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/p2pEncryption.html?locale=en_US">
+                            Point-to-Point Encryption</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/testingYourIntegration.html?locale=en_US">
+                            Testing Your Integration</a>
+                    </li>
+                    <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/examplesOfRequests.html?locale=en_US">
+                            Examples of requests</a>
+                    </li>
+                </ul>
+            </li>
+            <li class=" filter_aggregatorSupport">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/aggregatorSupport.html?locale=en_US">
+                    Aggregator</a>
+            </li>
+            <li class=" filter_marketplaceSupport">
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/marketplaceSupport.html?locale=en_US">
+                    Visa Marketplace Mandate</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/additionalAcceptorAndServiceLocationData.html?locale=en_US">
+                    Additional Acceptor and Service Location Data</a>
+            </li>
+            
+            <li>
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/supplementaryData.html?locale=en_US">
+                        Supplementary Data</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_accountFundingTransactions">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/accountFundingTransactions.html?locale=en_US">
+                            Account Funding Transactions</a>
+                    </li>
+                    <li class=" filter_acqCustomData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/acquirerCustomData.html?locale=en_US">
+                            Acquirer Custom Data</a>
+                    </li>
+                    <li class=" filter_airlineData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/airlineData.html?locale=en_US">
+                            Airline Data</a>
+                    </li>
+                                        <li>
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/cardHolderMerchantinitiatedPayment.html?locale=en_US">
+                            Cardholder and Merchant Initiated Payments</a>
+                    </li>
+                    <li class=" filter_cruiseData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/cruiseData.html?locale=en_US">
+                            Cruise Data</a>
+                    </li>
+                    <li class=" filter_custInternetData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/custInternetData.html?locale=en_US">
+                            Customer Internet Data</a>
+                    </li>
+                    <li class=" filter_debtRepaymentData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/debtRepaymentData.html?locale=en_US">
+                            Debt Repayment Data</a>
+                    </li>
+                    <li class=" filter_healthcareData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/healthCareData.html?locale=en_US">
+                            Healthcare Data</a>
+                    </li>
+                    <li class=" filter_highRiskCryptoData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/highRiskSecuritiesAndCryptocurrencyIndicatorData.html?locale=en_US">
+                            High-Risk Securities and Cryptocurrency Indicator Data</a>
+                    </li>
+                    <li class=" filter_mastercardQRTransactions">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/mastercardQRTransactions.html?locale=en_US">
+                            Mastercard QR Transaction Solutions</a>
+                    </li>
+                    <li class=" filter_merchantCustomData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/merchantCustomData.html?locale=en_US">
+                            Merchant Custom Data</a>
+                    </li>
+                    <li class=" filter_riskCustomData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/riskCustomData.html?locale=en_US">
+                            Risk Custom Data</a>
+                    </li>
+                    <li class=" filter_statementDescData">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/statementDescriptorData.html?locale=en_US">
+                            Statement Descriptor Data</a>
+                    </li>
+                    <li class=" filter_storedCredentials">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/storedCredentials.html?locale=en_US">
+                            Credential on File Transactions</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenDataMigration.html?locale=en_US">
+                    Import Merchant Data</a>
+            </li>
+            <li class=" filter_orderLineItemData">
+                <div class="toggle-panel">
+                    <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/orderLineItemData.html?locale=en_US">
+                        Order and Line Item Data</a>
+                    <span class="collapsedView"/>
+                </div>
+                <ul>
+                    <li class=" filter_levelIIAndIII">
+                        <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/levelIIAndIIIData/index.html?locale=en_US">
+                            Level 2 and 3 Data</a>
+                        <ul>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/levelIIAndIIIData/firstData.html?locale=en_US">
+                                    Level II/III Data for the First Data Acquirer</a>
+                            </li>
+                            <li>
+                                <a href="/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/levelIIAndIIIData/americanExpress.html?locale=en_US">
+                                    Level 2 and 3 Data for American Express Acquirers</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li class="sidebar-label">
+        API Implementation</li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/apiReference/apiRefMakingAServerReq.html?locale=en_US">
+            Making a Server API Request</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiRefAuthOptions.html?locale=en_US">
+                    Authentication Options</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiRefSettingupAPICredentials.html?locale=en_US">
+                    Setting up API Credentials</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiRefSessionAuthenticationFields.html?locale=en_US">
+                    Session Authentication Fields</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiRefAPIErrorHandling.html?locale=en_US">
+                    API Error Handling</a>
+            </li>
+            <li>
+                <a href="/api/documentation/integrationGuidelines/apiReference/apiRefTransactionErrors.html?locale=en_US">
+                    Transaction Errors</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/apiReference/apRefUsingMultiplePayment.html?locale=en_US">
+            Using Multiple Payment Sources</a>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/apiReference/apiRefJavaScriptLibraries.html?locale=en_US">
+            JavaScript Libraries</a>
+    </li>
+    <li class="sidebar-label">
+        Resources</li>
+    <li class=" filter_excludeForCiti">
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/announcements.html?locale=en_US">
+            Announcements</a>
+    </li>
+    <li>
+        <a href="/api/documentation/glossary/index.html?locale=en_US">
+            Glossary</a>
+    </li>
+
+
+    <li class=" filter_migrationGuides">
+    <a href="/api/documentation/migration/upgradeYourApiVersion.html?locale=en_US">
+            Migration Guides</a>
+        <ul class="subMenu">
+            <li>
+                <a href="/api/documentation/migration/hostedBatchv100.html?locale=en_US">
+                    Migrate to Hosted Batch version 100</a>
+            </li>
+            <li>
+                <a href="/api/documentation/migration/migrateHCOv100.html?locale=en_US">
+                    Migrate Hosted Checkout to version 100</a>
+            </li>
+            <li>
+                <a href="/api/documentation/migration/migrateHostedSessionv100.html?locale=en_US">
+                    Migrate to Hosted Session version 100</a>
+            </li>
+            <li>
+                <a href="/api/documentation/migration/directPaymentv100.html?locale=en_US">
+                    Migrate to Direct Payment API version 100</a>
+            </li>
+            <li>
+                <a href="/api/documentation/migration/testYourAPIVersionMigration.html?locale=en_US">
+                    Testing your integration for breaking changes</a>
+            </li>
+        </ul>
+    </li>
+    <li>
+        <a href="/api/documentation/troubleshootingFaqs/index.html?locale=en_US">
+            Troubleshooting &amp; FAQs</a>
+    </li>
+    <li>
+        <a href="/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US">
+            Test Cards</a>
+    </li>
+    <li>
+        <a href="/api/documentation/downloads/index.html?locale=en_US">
+            Downloads</a>
+    </li>
+    
+</ul>
+</nav>
+    <div id="ContainerContent">
+    <div class="container">
+      <div id="containerBody" role="main">
+        <div id="breadcrumbs"/>
+        <input id="copyToClipboard" type="hidden" value="Copied to Clipboard"/>
+        <div id="expandableContent" class="expandableContent">
+<div class="expandingSections">
+
+<h1 id="x_3DSTest">Test Your Integration</h1>
+<p>You can validate your 3DS Authentication integration by using the 3DS Emulator provided by the payment gateway. To begin testing, log in with your test merchant profile. This profile should include the "TEST" prefix, as supplied by your payment service provider.</p>
+<p>The emulator supports a variety of test card scenarios to simulate different 3DS outcomes. These test cards do not replicate the behavior of Access Control Servers (ACS).</p>
+<p>The gateway supports 3DS testing for both browser-based (web authentications) and SDK/in-app channels (mobile integrations) channels. This guide covers the following topics:</p>
+<ul>
+  <li><a href="#x_browser3dstesting" class="x_samePageJump">Browser-based 3DS testing</a></li>
+  <li><a href="#x_test_3ds_testingmobileint" class="x_samePageJump">Mobile integration 3DS testing</a></li>
+  <li><a href="#x_3dsfaqs" class="x_samePageJump">FAQs</a></li>
+</ul>
+
+<h2 id="x_browser3dstesting">Test 3DS functionality: Browser integration</h2>
+<p>Follow these steps to test 3DS functionality:</p>
+<ol>
+<li>Use a test card from the 3DS Test Cards table when submitting the <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Authentication%3a%20%20Initiate%20Authentication.html?locale=en_US">INITIATE AUTHENTICATION</a> request for your TEST merchant profile.<br/>
+Use the expiry code "01/39" to get a successful authorization or payment in an end-to-end testing flow.</li>
+<li>Set <code>authentication.channel = PAYER_BROWSER</code> and <code>authentication.purpose = 'PAYMENT_TRANSACTION'</code>.</li>
+<li>Check if the authentication is available (<code>authentication.version</code>=3DS2).</li>
+<li>Submit an <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Authentication%3a%20%20Authenticate%20Payer.html?locale=en_US">AUTHENTICATE PAYER</a> request.</li>
+<li>Insert the contents of the <code>authentication.redirect.html</code> field into the page displayed to the payer, which redirects the payer's browser to the 3DS Emulator challenge page. <br/>
+	The 3DS Emulator redirects the payer's browser back to your website when the authentication is complete.</li>
+<li>Select a specific 3DS authentication result from the drop-down menu in the 3DS Emulator. See the values in the following Transaction Status Options in the 3DS Emulator table.
+</li>	
+<li>Select a successful authentication result if you want to reference this authentication transaction in a subsequent AUTHORIZE or PAY request and want the financial transaction to be successful.</li>
+<li>Use the transaction ID for this 3DS authentication in the <code>authentication.transactionId</code> field of a subsequent <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html?locale=en_US">AUTHORIZE</a> or <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html?locale=en_US">PAY</a> transaction request.</li>
+</ol>
+	
+<h2 id="x_3dstestcards">Browser integration 3DS test cards</h2>
+<p>In the table,</p>
+<ul>
+<li>The ACS Method Call column defines whether the card supports the ACS method.</li>
+<li>The transStatus and transStatusReason columns define the values returned in the <code>authentication.3ds2.transactionStatus</code> and <code>authentication.3ds2.statusReasonCode</code> fields, respectively.</li>
+</ul>
+<p>The following table lists the cards you can use to test the 3DS functionality.</p>
+<div class="horiz-scroll">
+<table>
+    <tr>
+      <th scope="col">Test Cards</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Card Number</th>
+      <th scope="col">3DS2 Enrolled</th>
+      <th scope="col">ACS Method Call</th>
+      <th scope="col">tranStatus</th>
+      <th scope="col">tranStatusReason</th>
+      <th scope="col">ECI</th>
+      <th scope="col">Authentication Token</th>
+    </tr>
+    <tr>
+      <th scope="row" rowspan="9">Mastercard</th>
+      <td>Challenge</td>
+      <td>5123450000000008<br/>
+        2223000000000007</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Frictionless</td>
+      <td>5123456789012346</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">02</td>
+      <td>mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">5555555555000018</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">02</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+      <td colspan="1">Authentication Attempted</td>
+      <td colspan="1">5500005555555559</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">A</td>
+      <td colspan="1">-</td>
+      <td colspan="1">01</td>
+      <td colspan="1">nHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+      <td colspan="1">Authentication Rejected</td>
+      <td colspan="1">5506900140100503</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">R</td>
+      <td colspan="1">04</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+    <tr>
+      <td colspan="1">Error during INITIATE AUTHENTICATION operation resulting in Generic Error Response</td>
+      <td colspan="1">5210760000000004</td>
+      <td colspan="1">Exception</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Error during AUTHENTICATE PAYER operation resulting in Generic Error Response</td>
+      <td>5455031257390496</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">Exception</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>5455031252665454</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">Exception</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+
+
+    <tr>
+      <td>Authentication Unavailable Error during Authenticate Payer operation resulting in a response of authenticationStatus = AUTHENTICATION_UNAVAILABLE</td>
+      <td>5123459999998221</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">Recoverable Exception</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th scope="row" rowspan="3">Visa</th>
+      <td>Challenge</td>
+      <td>4440000009900010</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Frictionless</td>
+      <td>4440000042200014</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td>mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+      <td>Authentication Attempted</td>
+      <td>4440000042200022</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">A</td>
+      <td colspan="1">-</td>
+      <td colspan="1">06</td>
+      <td>nHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+	<th scope="row" rowspan="2">American Express</th>
+       <td>Challenge</td>
+      <td>371881733404002</td>
+      <td>Yes</td>
+      <td>No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Frictionless</td>
+      <td>371881887105009</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>-</td>
+      <td>05</td>
+      <td>mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+<tr>
+	 <th scope="row" rowspan="1">Maestro</th>
+      <td colspan="1">PSD2 Exemptions and Trusted Merchants</td>
+      <td colspan="1">5000000000000000005</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">No</td>
+      <td colspan="1">81</td>
+      <td colspan="1">06</td>
+      <td colspan="1">kNyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+	
+<tr>
+	 <th scope="row" rowspan="4">JCB</th>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">3528249999991755</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+	
+<tr>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">3528249999991748</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>	
+	
+<tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">3528249999991821</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>	
+
+    <tr>
+      <td colspan="1">Authentication Rejected</td>
+      <td colspan="1">3528249999981236</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">R</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+<tr>
+	 <th scope="row" rowspan="5">Diners</th>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">3600000000000115</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">3600000000000123</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>	
+
+<tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">3600000000000131</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td colspan="1">AAICBycxlQAAAAAAGTGVAAAAAAA=</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">36721601220030</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td colspan="1">AJkBBGBIJGhlhpFBFEgkAAAAAAA=</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Authentication Rejected</td>
+      <td colspan="1">3600000000000172</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">R</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>	
+
+	
+
+<tr>
+	 <th scope="row" rowspan="5">Discover</th>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">6445644564456445</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">6445644564456460</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">6445644564456411</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+
+<tr>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">6587060001006370</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">-</td>
+      <td colspan="1">05</td>
+      <td colspan="1">AJkBBGBIJGhlhpFBFEgkAAAAAAA=</td>
+    </tr>
+	
+<tr>
+      <td colspan="1">Authentication Rejected</td>
+      <td colspan="1">6445644564456155</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">R</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>	
+     <tr>
+	 <th scope="row" rowspan="5">MASTERCARD_ITMX</th>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">5594509999999006</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">Yes</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+     <tr>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">5297649999999000</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+     <tr>
+      <td colspan="1">Authentication Attempted</td>
+      <td colspan="1">5391979999999048</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">A</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+     <tr>
+      <td colspan="1">Not Authenticated</td>
+      <td colspan="1">5391979999999055</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">N</td>
+      <td colspan="1">04</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+     <tr>
+      <td colspan="1">Mastercard ITMX Frictionless V220</td>
+      <td colspan="1">5391979999999014</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+     <tr>
+	 <th scope="row" rowspan="5">VISA_ITMX</th>
+      <td colspan="1">Frictionless</td>
+      <td colspan="1">4215849999999008</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+     <tr>
+      <td colspan="1">Challenge</td>
+      <td colspan="1">4943129999999004</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+     <tr>
+      <td colspan="1">Authentication Attempted</td>
+      <td colspan="1">4013679999999045</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">A</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+     <tr>
+      <td colspan="1">Not Authenticated</td>
+      <td colspan="1">4013679999999052</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">N</td>
+      <td colspan="1">04</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+    </tr>
+     <tr>
+      <td colspan="1">Visa ITMX Frictionless V220</td>
+      <td colspan="1">4013679999999011</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">No</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td colspan="1">mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+    </tr>
+    <tr>
+      <th rowspan="6">UnionPay 3-D Secure</th>
+         <td colspan="1">3DS2 - Frictionless Payer Browser</td>
+         <td colspan="1">6201089999995464</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">Yes</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">-</td>
+         <td colspan="1">05</td>
+         <td colspan="1">ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+       </tr>
+        <tr>
+         <td colspan="1">3DS2 - Challenge Payer Browser</td>
+         <td colspan="1">6201089999991455</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">Yes</td>
+         <td colspan="1">C</td>
+         <td colspan="1">-</td>
+         <td colspan="1">-</td>
+         <td colspan="1">-</td>
+       </tr>
+       <tr>
+        <td colspan="1">3DS2 - Challenge Payer Browser -19 digit</td>
+        <td colspan="1">6213249999999991208</td>
+        <td colspan="1">Y</td>
+        <td colspan="1">Yes</td>
+        <td colspan="1">C</td>
+        <td colspan="1">-</td>
+        <td colspan="1">-</td>
+        <td colspan="1">-</td>
+      </tr>
+        <tr>
+         <td colspan="1">3DS2 - Authentication Attempted</td>
+         <td colspan="1">6201089999994020</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">No</td>
+         <td colspan="1">A</td>
+         <td colspan="1">-</td>
+         <td colspan="1">06</td>
+         <td colspan="1">ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+       </tr>
+        <tr>
+         <td colspan="1">3DS2 - Unavailable Authentication</td>
+         <td colspan="1">6201080999990852</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">No</td>
+         <td colspan="1">U</td>
+         <td colspan="1">01</td>
+         <td colspan="1">07</td>
+         <td colspan="1">-</td>
+       </tr>
+        <tr>
+         <td colspan="1">3DS2 -Not authenticated</td>
+         <td colspan="1">6201080999990423</td>
+         <td colspan="1">Y</td>
+         <td colspan="1">No</td>
+         <td colspan="1">N</td>
+         <td colspan="1">04</td>
+         <td colspan="1">-</td>
+         <td colspan="1">-</td>
+       </tr>
+
+    <tr>
+          <th scope="row" rowspan="9">PayPak</th>
+          <td>Challenge</td>
+          <td>2205459999997832<br/>
+            2205439999999541</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td colspan="1">C</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          </tr>
+          <tr>
+          <td>Challenge</td>
+                <td>2205589999999485<br/>
+                  2205819999992101</td>
+                <td>Yes</td>
+                <td>No</td>
+                <td colspan="1">C</td>
+                <td colspan="1">-</td>
+                <td colspan="1">-</td>
+                <td colspan="1">-</td>
+        </tr>
+          <tr>
+          <td>Frictionless</td>
+          <td>2205939999992560<br/>
+          </td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td colspan="1">Y</td>
+          <td colspan="1">-</td>
+          <td colspan="1">02</td>
+          <td>mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+        </tr>
+        <tr>
+              <td>Frictionless</td>
+              <td>2205789999999978<br/>
+              2205729999994371</td>
+              <td>Yes</td>
+              <td>No</td>
+              <td colspan="1">Y</td>
+              <td colspan="1">-</td>
+              <td colspan="1">02</td>
+              <td>mHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+            </tr>
+            <tr>
+          <td colspan="1">Authentication Attempted</td>
+          <td colspan="1">2206409999999295</td>
+          <td colspan="1">Yes</td>
+          <td colspan="1">No</td>
+          <td colspan="1">A</td>
+          <td colspan="1">-</td>
+          <td colspan="1">01</td>
+          <td colspan="1">nHyn+7YFi1EUAREAAAAvNUe6Hv8=</td>
+        </tr>
+        <tr>
+          <td colspan="1">Authentication Rejected</td>
+          <td colspan="1">2206389999998630</td>
+          <td colspan="1">Yes</td>
+          <td colspan="1">No</td>
+          <td colspan="1">R</td>
+          <td colspan="1">04</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+        </tr>
+        <tr>
+          <td colspan="1">Error during INITIATE AUTHENTICATION operation resulting in Generic Error Response</td>
+          <td colspan="1">2205919999999930</td>
+          <td colspan="1">Exception</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+        </tr>
+        <tr>
+              <td colspan="1">Error during AUTHENTICATE PAYER operation resulting in Generic Error Response</td>
+              <td colspan="1">2205609999999655</td>
+              <td colspan="1">Yes</td>
+              <td colspan="1">No</td>
+              <td colspan="1">Exception</td>
+              <td colspan="1">-</td>
+              <td colspan="1">-</td>
+              <td colspan="1">-</td>
+            </tr>
+
+         <tr>
+          <td>Authentication Unavailable Error during Authenticate Payer operation resulting in a response of authenticationStatus = AUTHENTICATION_UNAVAILABLE</td>
+          <td>2205689999997123</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td colspan="1">Recoverable Exception</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+          <td colspan="1">-</td>
+        </tr>
+        <tr>
+          <th rowspan="6">Jaywan mono-badge test cards</th>
+          <td>3DS2 - Challenge Payer Browser</td>
+          <td>6690109900000010</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>C</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>3DS2 - Frictionless Payer Browser</td>
+          <td>6690109000011008</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Y</td>
+          <td>-</td>
+          <td>05</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>3DS2 - Challenge Payer Browser</td>
+          <td>6690109000011008</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Y</td>
+          <td>-</td>
+          <td>05</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>3DS2 - Authentication Attempted</td>
+          <td>6690109000011024</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>A</td>
+          <td>Not present</td>
+          <td>06</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>3DS2 - Unavailable Authentication</td>
+          <td>6690109000011032</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>U</td>
+          <td>01</td>
+          <td>07</td>
+          <td>not present</td>
+        </tr>
+        <tr>
+          <td>3DS2 - Not authenticated</td>
+          <td>6690109000011040</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>N</td>
+          <td>04</td>
+          <td>not present</td>
+          <td>not present</td>
+        </tr>
+        <tr>
+          <th rowspan="2">Jaywan Co-badge Mastercard</th>
+          <td>Frictionless</td>
+          <td>5175540000050008</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Y</td>
+          <td>Not Present</td>
+          <td>02</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>Challenge</td>
+          <td>5175540000050099</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>C</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th rowspan="2">Jaywan Co-badge Jaywan</th>
+          <td>Frictionless</td>
+          <td>5175540000050008</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Y</td>
+          <td>Not Present</td>
+          <td>05</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>Challenge</td>
+          <td>5175540000050099</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>C</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th rowspan="2">Jaywan Co-badge Visa</th>
+          <td>Frictionless</td>
+          <td>4439130000050003</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Y</td>
+          <td>-</td>
+          <td>05</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>Challenge</td>
+          <td>4439130000050011</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>C</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <th rowspan="2">Jaywan Co-badge Jaywan</th>
+          <td>Frictionless</td>
+          <td>4439130000050003</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>Y</td>
+          <td>-</td>
+          <td>05</td>
+          <td>ABCQAwUANHQYQoQYARWTUEFnAAA=</td>
+        </tr>
+        <tr>
+          <td>Challenge</td>
+          <td>4439130000050011</td>
+          <td>Yes</td>
+          <td>Yes</td>
+          <td>C</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+ </table>
+</div>
+<p>For a "C" <strong>transStatus</strong>, the following table lists the options that are available on the drop-down menu in the 3DS Emulator and the resulting values in the response.</p>
+	
+<table>
+  <tr>
+    <th width="168" class="hide" scope="col">Options</th>
+    <th width="76" scope="col">transStatus</th>
+    <th width="109" scope="col">challengeCancel</th>
+    <th width="67" scope="col">eci</th>
+  </tr>
+   <tr>
+     <th scope="row" class="left"><div>Successful authentication</div></th>
+     <td>Y</td>
+     <td>-</td>
+     <td>05 / 02</td>
+</tr>
+   <tr>
+    <th scope="row" class="left"><div>Failed authentication</div></th>
+    <td>N</td>
+    <td>-</td>
+      <td>07 / 00</td>
+  </tr>
+   <tr>
+    <th scope="row" class="left"><div>Cancelled authentication</div></th>
+    <td>N</td>
+    <td>01</td>
+      <td>07 / 00</td>
+  </tr>
+   <tr>
+     <th scope="row" class="left">Unable to authenticate</th>
+     <td>U</td>
+     <td>-</td>
+     <td>07 / 00</td>
+   </tr>
+   <tr>
+     <th scope="row" class="left">Authentication rejected</th>
+     <td>R</td>
+     <td>-</td>
+     <td>07 / 00</td>
+   </tr>
+</table>	
+<h2 id="x_test_3ds_testingmobileint">Test 3DS functionality: <a href="../../../pickPaymentMethod/devicePayments/mobileintegration.html?locale=en_US">Mobile integration</a></h2>
+<p>Follow these steps to test 3DS functionality:</p>
+<ol>
+<li>Use a test card from the following 3DS Test Cards table when submitting the <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Authentication%3a%20%20Initiate%20Authentication.html?locale=en_US">INITIATE AUTHENTICATION</a> request for your TEST merchant profile.<br/>
+Use the expiry code "01/39" to get a successful authorization or payment in an end-to-end testing flow.</li>
+<li>Set <code>authentication.channel = PAYER_APP</code> and <code>authentication.purpose = 'PAYMENT_TRANSACTION'</code>.</li>
+<li>Check if the authentication is available (<code>authentication.version</code>=3DS2).</li>
+<li>Submit an <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Authentication%3a%20%20Authenticate%20Payer.html?locale=en_US">AUTHENTICATE PAYER</a> request.</li>
+<li>After the authentication is complete, the Mobile SDK receives a response:
+  <ol type="a">
+    <li>
+    Frictionless flow:<br/> If the test card supports frictionless authentication, the Authenticate Payer response returns <code>authenticationStatus = AUTHENTICATION_SUCCESSFUL</code>, and you can proceed to step 6.
+  </li>
+  <li>
+    Challenge flow:<br/>
+If the test card requires a challenge, the Authenticate Payer response returns <code>authenticationStatus = AUTHENTICATION_PENDING</code> while the authentication process occurs. Once the challenge is completed, the Mobile SDK provides a recommendation to your application on whether to proceed with the transaction.
+  </li>
+</ol>
+</li>
+<li>Once you are ready to process your payment, use the transaction ID for this 3DS authentication in the <code>authentication.transactionId</code> field of a subsequent <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html?locale=en_US">AUTHORIZE</a> or <a href="../../../../../apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html?locale=en_US">PAY</a> transaction request.</li>
+</ol>
+
+<h2>Mobile SDK integration 3DS test cards</h2>
+
+<div class="horiz-scroll">
+<table>
+    <tr>
+      <th scope="col">Test Cards</th>
+      <th scope="col">Purpose</th>
+      <th scope="col">Card Number</th>
+      <th scope="col">tranStatus</th>
+      <th scope="col">tranStatusReason</th>
+      <th scope="col">ECI</th>
+      <th scope="col">Authentication Token</th>
+    </tr>
+    <tr>
+      <th scope="row" rowspan="4">Mastercard</th>
+      <td>Frictionless</td>
+      <td>2223000000000023</td>
+      <td colspan="1">Y</td>
+      <td colspan="1">-</td>
+      <td colspan="1">02</td>
+      <td>xgQYYgZVAAAAAAAAAAAAAAAAAAAA</td>
+    </tr>
+    <tr>
+      <td>Challenged-(OTP HTML)</td>
+      <td>5123450000000008</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Challenged-(OTP Native)</td>
+      <td>2223000000000007</td>
+      <td colspan="1">C</td>
+      <td colspan="1">-</td>
+      <td colspan="1">-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Not Authenticated</td>
+      <td>5111111111111118</td>
+      <td colspan="1">N</td>
+      <td colspan="1">01</td>
+      <td colspan="1">0-</td>
+      <td>-</td>
+    </tr>
+</table>
+</div>
+<h2 id="x_3dsfaqs">FAQs</h2>
+<div class="x_expand">What steps should I take when a 3DS error code is returned?</div>
+<div class="x_collapse">
+<p>The gateway returns error messages from the authentication servers. You can use error messages to identify which fields are causing your integration to break when an authentication request is sent. For example,</p>
+<ul>
+<li>Error Message:<br/>
+An authentication scheme indicates that your acquirer does not onboard the authentication scheme for EMV 3DS. Contact your acquirer or PSP.
+</li>
+<li>Error Cause:<br/>
+Before you can start using the EMV 3DS functionality, your acquirer needs to onboard you with the respective authentication scheme. Contact your acquirer or PSP to check these values. 
+</li>
+</ul>
+</div>
+<div id="x_3DSDeriveResult" class="x_expand">What should I do when there is a delay while searching for orders or transactions within the Merchant Administrator?</div>
+<div class="x_collapse">
+<p>You can see the authentication details in the Merchant Administrator only when the payer authentication is complete. If the payer is still going through the challenge flow or abandons the process, there can be a delay before that transaction is visible on the Merchant Administration.</p>
+
+To see the current state of the authentication without delay, use the <a href="/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Retrieve%20Order.html?locale=en_US">RETRIEVE ORDER</a> or <a href="/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Retrieve%20Transaction.html?locale=en_US">RETRIEVE TRANSACTION</a> operation.
+</div>
+	
+</div> <!-- End: Expanding Sections -->
+</div> <!-- End: Expandable Content -->
+	
+</div>
+      <div id="pageNavigation">
+        <h4 id="pageNavigationLabel">On This Page</h4>
+      </div>
+    </div>
+    <script type="text/javascript" src="/api/scripts/contentFooter.js" integrity="sha512-kR13T3BmMBZ96YLLjtFF8YwC/LLQ2xdeEGa/eiryU/iDgLB7aFWxmf2fJYNk6tbN0zUJgAg522EvYgOIyFFjuA==">//</script>
+
+<div id="ContainerFooter">
+   <hr id="FooterLineSeparator"/>
+   <div id="Footer1">
+   </div>
+   <div id="Footer2">
+      <div id="resources" class="width-30-pct">
+         <p>Resources</p>
+         <a href="/api/documentation/downloads/index.html?locale=en_US" id="tab5">Downloads</a>
+            
+         <a href="/api/documentation/glossary/index.html?locale=en_US" id="tab4">Glossary</a>
+         <a href="/api/documentation/troubleshootingFaqs/index.html?locale=en_US" id="tab3">FAQs</a>
+      </div>
+      <div id="about" class="width-30-pct"/>
+      <div id="copyright" class="width-30-pct">
+         <p>Copyright © 2026 Mastercard</p>
+      </div>
+   </div>
+   <div id="Footer3"/>
+</div>
+</div>
+</div>
+</div> <!-- End ContainerMain -->
+    </div> <!-- End OuterBorder -->
+</body>
+</html>
