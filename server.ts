@@ -4,10 +4,9 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 
-async function startServer() {
-  const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+export const app = express();
 
+async function startServer() {
   app.use(cors());
   app.use(express.json());
 
@@ -311,7 +310,7 @@ async function startServer() {
     }
   });
 
-  // Vite middleware for development
+  // Vite middleware for development (local only)
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
@@ -326,9 +325,14 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
 }
 
-startServer();
+// Only start the local server when NOT running in Netlify Functions
+if (!process.env.NETLIFY) {
+  const PORT = Number(process.env.PORT) || 3000;
+  startServer().then(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  });
+}
