@@ -25,15 +25,13 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, onEnroll }) => {
     const [paymentMethod, setPaymentMethod] = useState<'visa' | 'cliq'>('visa');
     const [paymentReceipt, setPaymentReceipt] = useState<any>(null);
     const [paymentStep, setPaymentStep] = useState<string>('');
-    const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
     const [sessionReady, setSessionReady] = useState(false);
     const [showOTPFrame, setShowOTPFrame] = useState(false);
 
     const log = useCallback((msg: string) => {
         const time = new Date().toLocaleTimeString();
-        const entry = `[${time}] ${msg}`;
-        console.log(entry);
-        setDebugLogs(prev => [...prev, entry]);
+        console.log(`[${time}] ${msg}`);
     }, []);
 
     const generateOrderId = () => `JOT-${String(Math.floor(Math.random() * 100000000)).padStart(8, '0')}`;
@@ -492,22 +490,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({ course, onEnroll }) => {
                     </div>
                 </div>
 
-                {/* Debug Panel */}
-                {debugLogs.length > 0 && (
-                    <div className="mt-8 bg-gray-900 text-green-400 p-6 rounded-2xl shadow-xl max-w-6xl mx-auto">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-black text-xs uppercase tracking-widest text-green-300">🔧 Debug Console</h3>
-                            <button onClick={() => setDebugLogs([])} className="text-xs text-gray-500 hover:text-red-400 font-bold">Clear</button>
-                        </div>
-                        <div className="space-y-1 font-mono text-[11px] max-h-[400px] overflow-y-auto">
-                            {debugLogs.map((logEntry, i) => (
-                                <div key={i} className={`py-1 border-b border-gray-800 ${logEntry.includes('❌') || logEntry.includes('💥') ? 'text-red-400' : logEntry.includes('✅') || logEntry.includes('🎉') ? 'text-green-400' : 'text-gray-300'}`}>
-                                    {logEntry}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
             </div>
         </div>
     );
